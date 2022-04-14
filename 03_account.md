@@ -278,6 +278,6 @@ qr = require("/node_modules/symbol-qr-library");
 signerQR = qr.AccountQR.fromJSON({暗号化された秘密鍵のJSONデータ},{パスフレーズ});
 console.log(signerQR.accountPrivateKey);
 
-> 896E43895B908AF5847ECCB2645543751D94BD87E71058B003417FED512314AE
+> 896E43895B908AF5847ECCB2645543751D94BD87E71058B003417FED5123****
 ```
 
