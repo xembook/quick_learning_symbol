@@ -1,5 +1,7 @@
 # 12.オフライン署名
-ロック機構の章で、アナウンスしたトランザクションをハッシュ値指定でロックして、複数の署名（オンライン署名）を集めるアグリゲートトランザクションを紹介しました。  
+
+ロック機構の章で、アナウンスしたトランザクションをハッシュ値指定でロックして、  
+複数の署名（オンライン署名）を集めるアグリゲートトランザクションを紹介しました。    
 この章では、トランザクションを事前に署名を集めてノードにアナウンスするオフライン署名について説明します。  
 
 ### 手順
@@ -123,3 +125,10 @@ signedPayload = littleEndianSize + signedPayload.substr(8, signedPayload.length 
 signedTx = new sym.SignedTransaction(signedPayload, signedHash, alice.publicKey, recreatedTx.type, recreatedTx.networkType);
 
 await txRepo.announce(signedTx,listener).toPromise();
+```
+
+## 12.4 現場で使えるヒント
+
+ボンデッドトランザクションと異なりハッシュロックの費用を気にする必要がありません。  
+ペイロードを共有できる場が存在する場合は十分に利用価値があります。  
+ただ、オフラインで署名を交換するため、なりすましのペイロード署名要求には気を付けた方がいいでしょう。  
