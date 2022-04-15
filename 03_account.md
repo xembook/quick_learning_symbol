@@ -1,9 +1,8 @@
 # 3.アカウント
-
 アカウントは秘密鍵に紐づく情報が記録されたデータ構造体です。  
 アカウントと関連づいた秘密鍵を使って署名することでのみブロックチェーンのデータを更新することができます。  
 
-## アカウント生成
+## 3.1 アカウント生成
 
 アカウントには秘密鍵と公開鍵をセットにしたキーペア、アドレスなどの情報が含まれています。  
 まずはランダムにアカウントを作成して、それらの情報を確認してみましょう。  
@@ -84,7 +83,7 @@ console.log(aliceAddress);
     networkType: 152
 ```
 
-## アカウントへの送信
+## 3.2 アカウントへの送信
 
 アカウントを作成しただけでは、ブロックチェーンにデータを送信することはできません。  
 パブリックブロックチェーンはリソースを有効活用するためにデータ送信時に手数料を要求します。  
@@ -117,7 +116,7 @@ Symbolブロックチェーンでは、この手数料をXYMという共通ト�
 - メインネット
   - https://symbol.fyi/
 
-## アカウント情報の確認
+## 3.3 アカウント情報の確認
 
 ノードに保存されているアカウント情報を取得します。
 
@@ -173,7 +172,7 @@ if(divisibility > 0){
 console.log(displayAmount);
 ```
 
-## 現場で使えるヒント
+## 3.4 現場で使えるヒント
 ### 暗号化と署名
 
 アカウントとして生成した秘密鍵や公開鍵は、そのまま従来の暗号化や電子署名として活用することができます。  
@@ -217,25 +216,26 @@ console.log(decryptMessage);
 Aliceの秘密鍵でメッセージを署名し、Aliceの公開鍵と署名でメッセージを検証します。
 
 ```js
-payload = sym.Convert.hexToUint8(sym.Convert.utf8ToHex("Hello Symol!"));
-signature = sym.Convert.utf8ToHex(sym.KeyPair.sign(alice.keyPair, payload));
+Buffer = require("/node_modules/buffer").Buffer;
+payload = Buffer.from("Hello Symol!", 'utf-8');
+signature = Buffer.from(sym.KeyPair.sign(alice.keyPair, payload)).toString("hex").toUpperCase();
 console.log(signature);
 
-> "7FCF7614D60BF4506DEC7D1B55AA1A0972881FA8FC40D0D0FBAAAF77E036E7988270E57631D49FCE253C4FB992E17C9360FA948B6626B2954E7DAB84DA7D6E01"
+> B8A9BCDE9246BB5780A8DED0F4D5DFC80020BBB7360B863EC1F9C62CAFA8686049F39A9F403CB4E66104754A6AEDEF8F6B4AC79E9416DEEDC176FDD24AFEC60E
 ```
 
 #### 検証
 ```js
 isVerified = sym.KeyPair.verify(
   alice.keyPair.publicKey,
-  sym.Convert.hexToUint8(nem.Convert.utf8ToHex("Hello Symbol!")),
-  sym.Convert.hexToUint8( 
- "7FCF7614D60BF4506DEC7D1B55AA1A0972881FA8FC40D0D0FBAAAF77E036E7988270E57631D49FCE253C4FB992E17C9360FA948B6626B2954E7DAB84DA7D6E01")
+  Buffer.from("Hello Symol!", 'utf-8'),
+  Buffer.from(signature, 'hex')
 )
-console.log(isVerified)
+console.log(isVerified);
 
 > true
 ```
+
 
 ### アカウントの保管
 
