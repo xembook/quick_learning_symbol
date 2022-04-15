@@ -140,25 +140,25 @@ console.log(result);
 
 ```js
 block = await blockRepo.getBlockByHeight(height).toPromise();
-previousBlock = await blockRepo.getBlockByHeight(targetBlockHeight - 1).toPromise();
+previousBlock = await blockRepo.getBlockByHeight(height - 1).toPromise();
 if(block.type ===  sym.BlockType.NormalBlock){
     
   hasher = sha3_256.create();
-  hasher.update(sym.Convert.hexToUint8(block.signature)); //signature
-  hasher.update(sym.Convert.hexToUint8(block.signer.publicKey)); //publicKey
+  hasher.update(Buffer.from(block.signature,'hex')); //signature
+  hasher.update(Buffer.from(block.signer.publicKey,'hex')); //publicKey
   hasher.update(cat.GeneratorUtils.uintToBuffer(   block.version, 1));
   hasher.update(cat.GeneratorUtils.uintToBuffer(   block.networkType, 1));
   hasher.update(cat.GeneratorUtils.uintToBuffer(   block.type, 2));
   hasher.update(cat.GeneratorUtils.uint64ToBuffer([block.height.lower    ,block.height.higher]));
   hasher.update(cat.GeneratorUtils.uint64ToBuffer([block.timestamp.lower ,block.timestamp.higher]));
   hasher.update(cat.GeneratorUtils.uint64ToBuffer([block.difficulty.lower,block.difficulty.higher]));
-  hasher.update(sym.Convert.hexToUint8(block.proofGamma));
-  hasher.update(sym.Convert.hexToUint8(block.proofVerificationHash));
-  hasher.update(sym.Convert.hexToUint8(block.proofScalar));
-  hasher.update(sym.Convert.hexToUint8(previousBlock.hash));
-  hasher.update(sym.Convert.hexToUint8(block.blockTransactionsHash));
-  hasher.update(sym.Convert.hexToUint8(block.blockReceiptsHash));
-  hasher.update(sym.Convert.hexToUint8(block.stateHash));
+  hasher.update(Buffer.from(block.proofGamma,'hex'));
+  hasher.update(Buffer.from(block.proofVerificationHash,'hex'));
+  hasher.update(Buffer.from(block.proofScalar,'hex'));
+  hasher.update(Buffer.from(previousBlock.hash,'hex'));
+  hasher.update(Buffer.from(block.blockTransactionsHash,'hex'));
+  hasher.update(Buffer.from(block.blockReceiptsHash,'hex'));
+  hasher.update(Buffer.from(block.stateHash,'hex'));
   hasher.update(sym.RawAddress.stringToAddress(block.beneficiaryAddress.address));
   hasher.update(cat.GeneratorUtils.uintToBuffer(   block.feeMultiplier, 4));
   hash = hasher.hex().toUpperCase();
@@ -171,8 +171,6 @@ true が出力されればこのブロックハッシュは前ブロックハッ
 
 これで、どのノードに問い合わせても確認可能な既知のファイナライズブロックが、  
 検証したいブロックの存在に支えられていることが分かりました。  
-これは、たとえブロックヘッダーと実体が一致しない気まぐれなノードから情報を取得したとしても  
-そのほかのノード、そしてネットワーク全体が検証したいトランザクションを取り込んで同期している、と考えることができます。  
 
 ### importanceブロックの検証
 
@@ -190,27 +188,27 @@ previousBlock = await blockRepo.getBlockByHeight(targetBlockHeight - 1).toPromis
 if(block.type ===  sym.BlockType.ImportanceBlock){
 
   hasher = sha3_256.create();
-  hasher.update(sym.Convert.hexToUint8(block.signature)); //signature
-  hasher.update(sym.Convert.hexToUint8(block.signer.publicKey)); //publicKey
+  hasher.update(Buffer.from(block.signature,'hex')); //signature
+  hasher.update(Buffer.from(block.signer.publicKey,'hex')); //publicKey
   hasher.update(cat.GeneratorUtils.uintToBuffer(   block.version, 1));
   hasher.update(cat.GeneratorUtils.uintToBuffer(   block.networkType, 1));
   hasher.update(cat.GeneratorUtils.uintToBuffer(   block.type, 2));
   hasher.update(cat.GeneratorUtils.uint64ToBuffer([block.height.lower    ,block.height.higher]));
   hasher.update(cat.GeneratorUtils.uint64ToBuffer([block.timestamp.lower ,block.timestamp.higher]));
   hasher.update(cat.GeneratorUtils.uint64ToBuffer([block.difficulty.lower,block.difficulty.higher]));
-  hasher.update(sym.Convert.hexToUint8(block.proofGamma));
-  hasher.update(sym.Convert.hexToUint8(block.proofVerificationHash));
-  hasher.update(sym.Convert.hexToUint8(block.proofScalar));
-  hasher.update(sym.Convert.hexToUint8(previousBlock.hash));
-  hasher.update(sym.Convert.hexToUint8(block.blockTransactionsHash));
-  hasher.update(sym.Convert.hexToUint8(block.blockReceiptsHash));
-  hasher.update(sym.Convert.hexToUint8(block.stateHash));
+  hasher.update(Buffer.from(block.proofGamma,'hex'));
+  hasher.update(Buffer.from(block.proofVerificationHash,'hex'));
+  hasher.update(Buffer.from(block.proofScalar,'hex'));
+  hasher.update(Buffer.from(previousBlock.hash,'hex'));
+  hasher.update(Buffer.from(block.blockTransactionsHash,'hex'));
+  hasher.update(Buffer.from(block.blockReceiptsHash,'hex'));
+  hasher.update(Buffer.from(block.stateHash,'hex'));
   hasher.update(sym.RawAddress.stringToAddress(block.beneficiaryAddress.address));
   hasher.update(cat.GeneratorUtils.uintToBuffer(   block.feeMultiplier, 4));
   hasher.update(cat.GeneratorUtils.uintToBuffer(block.votingEligibleAccountsCount,4));
   hasher.update(cat.GeneratorUtils.uint64ToBuffer([block.harvestingEligibleAccountsCount.lower,block.harvestingEligibleAccountsCount.higher]));
   hasher.update(cat.GeneratorUtils.uint64ToBuffer([block.totalVotingBalance.lower,block.totalVotingBalance.higher]));
-  hasher.update(sym.Convert.hexToUint8(block.previousImportanceBlockHash));
+  hasher.update(Buffer.from(block.previousImportanceBlockHash,'hex'));
 
   hash = hasher.hex().toUpperCase();
   console.log(hash === block.hash);
