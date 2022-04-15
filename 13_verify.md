@@ -258,8 +258,6 @@ console.log(block.stateHash === hash);
 ## 13.3 アカウント・メタデータの検証
 
 マークルパトリシアツリーを利用して、トランザクションに紐づくアカウントやメタデータの存在を検証します。  
-アカウント情報やメタ情報は何度発生したトランザクションの蓄積結果としての情報です。
-それらの情報を変更するたびに記録しているのがマークルパトリシアツリーです。
 
 ### 検証用共通関数
 
@@ -286,7 +284,6 @@ function checkState(stateProof,stateHash,pathHash,rootHash){
 
   const merkleLeaf = stateProof.merkleTree.leaf;
   const merkleBranches = stateProof.merkleTree.branches.reverse();
-  const pathArray = [...merkleBranches[0].path];
   const leafHash = getLeafHash(merkleLeaf.encodedPath,stateHash);
 
   let linkHash = leafHash; //最初のlinkHashはleafHash
@@ -295,27 +292,19 @@ function checkState(stateProof,stateHash,pathHash,rootHash){
       const branch = merkleBranches[i];
       const branchLink = branch.links.find(x=>x.link === linkHash)
       linkHash = getBranchHash(branch.encodedPath,branch.links);
-      bit =  branchLink.bit + bit;
-      if(i == 0 && pathArray.length == 2){
-        bit = pathArray[0] + bit;
-      }
-  }
-  let leafPath = merkleLeaf.path;
-  if(pathArray.length == 2){
-    if(merkleBranches.length % 2 == 0){
-      leafPath = leafPath.slice( 0, -1 );
-    }
-  }else if(merkleBranches.length % 2 == 1){
-    leafPath = leafPath.slice( 0, -1 );
+      bit = merkleBranches[i].path.slice(0,merkleBranches[i].nibbleCount) + branchLink.bit + bit ;
   }
 
   const treeRootHash = linkHash; //最後のlinkHashはrootHash
-  const treePathHash = bit + leafPath;
-  
+  let treePathHash = bit + merkleLeaf.path;
+
+  if(treePathHash.length % 2 == 1){
+    treePathHash = treePathHash.slice( 0, -1 );
+  }
+ 
   //検証
   console.log(treeRootHash === rootHash);
   console.log(treePathHash === pathHash);
-//  console.log(treePathHash.indexOf(pathHash) >= 0);
 }
 ```
 
@@ -325,7 +314,6 @@ function checkState(stateProof,stateHash,pathHash,rootHash){
 
 ```js
 aliceAddress = sym.Address.createFromRawAddress("NCESRRSDSXQW7LTYWMHZOCXAESNNBNNVXHPB6WY");
-
 
 hasher = sha3_256.create();
 alicePathHash = hasher.update(
@@ -351,18 +339,18 @@ checkState(stateProof,aliceStateHash,alicePathHash,rootHash);
 ```js
 
 srcAddress = sym.Convert.hexToUint8(
-    sym.Address.createFromRawAddress("NBWKWT2HMH7ADCZO2GDZAXEXXDISOKQOFSD3YWA").encoded()
+    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded()
 )
 
 targetAddress = sym.Convert.hexToUint8(
-    sym.Address.createFromRawAddress("NBWKWT2HMH7ADCZO2GDZAXEXXDISOKQOFSD3YWA").encoded()
+    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded()
 )
 
 hasher = sha3_256.create();    
 hasher.update(srcAddress);
 hasher.update(targetAddress);
-hasher.update(sym.Convert.hexToUint8Reverse("DA030AA7795EBE75")); // scopeKey
-hasher.update(sym.Convert.hexToUint8Reverse("5A4A9E5BF88D7552")); // targetId
+hasher.update(sym.Convert.hexToUint8Reverse("CF217E116AA422E2")); // scopeKey
+hasher.update(sym.Convert.hexToUint8Reverse("1275B0B7511D9161")); // targetId
 hasher.update(Uint8Array.from([sym.MetadataType.Mosaic])); // type: Account 0
 compositeHash = hasher.hex();
 
@@ -375,11 +363,11 @@ hasher = sha3_256.create();
 hasher.update(cat.GeneratorUtils.uintToBuffer(1, 2)); //version
 hasher.update(srcAddress);
 hasher.update(targetAddress);
-hasher.update(sym.Convert.hexToUint8Reverse("DA030AA7795EBE75")); // scopeKey
-hasher.update(sym.Convert.hexToUint8Reverse("5A4A9E5BF88D7552")); // targetId
+hasher.update(sym.Convert.hexToUint8Reverse("CF217E116AA422E2")); // scopeKey
+hasher.update(sym.Convert.hexToUint8Reverse("1275B0B7511D9161")); // targetId
 hasher.update(Uint8Array.from([sym.MetadataType.Mosaic])); //account
 
-value = sym.Convert.utf8ToUint8("{\"version\":\"comsa-nft-1.0\",\"name\":\"48415A455F4B5553414B414245\",\"title\":\"4B5553414B414245C39767696D7265\",\"hash\":\"d9e7638f65f622683f92b4c23e71a3d1ee34bd6e0707e34b1df91904e558989e\",\"type\":\"NFT\",\"mime_type\":\"image/jpeg\",\"media\":\"image\",\"address\":\"NCRG57OBWNFCHUCCFOGVURJUGDL5CSCHQNRSI5Y\",\"mosaic\":\"5A4A9E5BF88D7552\",\"endorser\":\"N/A\"}");
+value = sym.Convert.utf8ToUint8("test");
 
 hasher.update(cat.GeneratorUtils.uintToBuffer(value.length, 2)); 
 hasher.update(value); 
@@ -395,24 +383,22 @@ checkState(stateProof,stateHash,pathHash,rootHash);
 ```
 
 ###### アカウントへ登録したメタデータの検証
-- Key:F24C633A596D66E7
-- Value:546869732069732058454D426F6F6B2066756E64206163636F756E742E
 
 
 ```js
 srcAddress = sym.Convert.hexToUint8(
-    sym.Address.createFromRawAddress("NCESRRSDSXQW7LTYWMHZOCXAESNNBNNVXHPB6WY").encoded()
+    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded()
 )
 
 targetAddress = sym.Convert.hexToUint8(
-    sym.Address.createFromRawAddress("NBVHIH5E25AFIRQUYOEMZ35FKEOI275O36YMLZI").encoded()
+    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded()
 )
 
 //compositePathHash(Key値)
 hasher = sha3_256.create();    
 hasher.update(srcAddress);
 hasher.update(targetAddress);
-hasher.update(sym.Convert.hexToUint8Reverse("F24C633A596D66E7")); // scopeKey
+hasher.update(sym.Convert.hexToUint8Reverse("9772B71B058127D7")); // scopeKey
 hasher.update(sym.Convert.hexToUint8Reverse("0000000000000000")); // targetId
 hasher.update(Uint8Array.from([sym.MetadataType.Account])); // type: Account 0
 compositeHash = hasher.hex();
@@ -426,10 +412,10 @@ hasher = sha3_256.create();
 hasher.update(cat.GeneratorUtils.uintToBuffer(1, 2)); //version
 hasher.update(srcAddress);
 hasher.update(targetAddress);
-hasher.update(sym.Convert.hexToUint8Reverse("F24C633A596D66E7")); // scopeKey
+hasher.update(sym.Convert.hexToUint8Reverse("9772B71B058127D7")); // scopeKey
 hasher.update(sym.Convert.hexToUint8Reverse("0000000000000000")); // targetId
 hasher.update(Uint8Array.from([sym.MetadataType.Account])); //account
-value = sym.Convert.utf8ToUint8("546869732069732058454D426F6F6B2066756E64206163636F756E742E");
+value = sym.Convert.utf8ToUint8("test");
 hasher.update(cat.GeneratorUtils.uintToBuffer(value.length, 2)); 
 hasher.update(value); 
 stateHash = hasher.hex();
@@ -447,11 +433,13 @@ checkState(stateProof,stateHash,pathHash,rootHash);
 
 ノードへのデータ更新は、最終的にはブロックチェーン全体で検証されますが、  
 ノードからのデータ抽出は、ブロックチェーン全体からではなく一つのノードからのデータを取得したに過ぎないため、  
-自身が管理したノードから取得して完全に信頼できるブラウザで表示したものでない限り、厳密には検証する必要があります。  
+自身が管理したノードから取得して完全に信頼できるアプリケーションで表示したものでない限り、厳密には検証する必要があります。  
 
-- トランザクションが意図したアカウントに署名されたかを検証。
-- そのトランザクションが意図したブロックに含まれているかを検証。
-- トランザクションが指定するモザイクのメタデータがブロックに含まれるかを検証。
-- そのブロックから既知のファイナライズブロックに辿れるかを検証。
+例えば価値のあるカウントから重要なメタデータを記録したモザイクの送信トランザクションを検証する場合、
+トランザクションの署名検証だけでは不十分で、
+
+- そのトランザクションがブロックチェーンに含まれているかを検証。
+- 転送指定されたモザイクに記録されたメタデータがブロックに含まれるかを検証。
+- ファイナライズブロックからそのブロックへたどることができるか検証。
 
 すべての検証に成功すれば、メタデータに重要な証明が記されたモザイクの送信が間違いなくブロックチェーンに記録されていることが確認できます。  
