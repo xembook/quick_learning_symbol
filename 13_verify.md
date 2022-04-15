@@ -335,7 +335,6 @@ stateProof = await stateProofService.accountById(aliceAddress).toPromise();
 checkState(stateProof,aliceStateHash,alicePathHash,rootHash);
 ```
 
-### メタデータの検証
 
 ### モザイクへ登録したメタデータの検証
 ```js
@@ -384,7 +383,7 @@ stateProof = await stateProofService.metadataById(compositeHash).toPromise();
 checkState(stateProof,stateHash,pathHash,rootHash);
 ```
 
-###### アカウントへ登録したメタデータの検証
+### アカウントへ登録したメタデータの検証
 
 
 ```js
