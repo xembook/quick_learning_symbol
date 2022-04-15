@@ -52,6 +52,40 @@ signedPayloadをBobに渡して署名を促します。
 BobはAliceからsignedPayloadを受け取ります。
 
 ```js
+tx = sym.TransactionMapping.createFromPayload(signedPayload);
+console.log(tx);
+
+> AggregateTransaction
+    cosignatures: []
+    deadline: Deadline {adjustedValue: 12197090355}
+  > innerTransactions: Array(2)
+      0: TransferTransaction {type: 16724, networkType: 152, version: 1, deadline: Deadline, maxFee: UInt64, …}
+      1: TransferTransaction {type: 16724, networkType: 152, version: 1, deadline: Deadline, maxFee: UInt64, …}
+    maxFee: UInt64 {lower: 44800, higher: 0}
+    networkType: 152
+    payloadSize: undefined
+    signature: "4999A8437DA1C339280ED19BE0814965B73D60A1A6AF2F3856F69FBFF9C7123427757247A231EB89BB8844F37AC6F7559F859E2FDE39B8FA58A57F36DDB3B505"
+    signer: PublicAccount
+      address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
+      publicKey: "D4933FC1E4C56F9DF9314E9E0533173E1AB727BDB2A04B59F048124E93BEFBD2"
+    transactionInfo: undefined
+    type: 16705
+    version: 1
+```
+
+念のため、署名を検証します。
+```js
+Buffer = require("/node_modules/buffer").Buffer;
+res = tx.signer.verifySignature(
+    tx.getSigningBytes([...Buffer.from(signedPayload,'hex')],[...Buffer.from(generationHash,'hex')]),
+    tx.signature
+);
+console.log(res);
+
+> true
+```
+
+```js
 //Bobで署名
 bobSignedTx = sym.CosignatureTransaction.signTransactionPayload(bob, signedPayload, generationHash);
 bobSignedTxSignature = bobSignedTx.signature;
