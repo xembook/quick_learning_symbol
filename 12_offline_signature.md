@@ -85,6 +85,8 @@ console.log(res);
 > true
 ```
 
+
+問題なければ署名します。
 ```js
 //Bobで署名
 bobSignedTx = sym.CosignatureTransaction.signTransactionPayload(bob, signedPayload, generationHash);
