@@ -1,13 +1,12 @@
 # 12.オフライン署名
-
-ロック機構の章で、アナウンスしたトランザクションをハッシュ値指定でロックして、複数の署名（オンライン署名）を集めるアグリゲートトランザクションを紹介しました。
-この章では、トランザクションを事前に署名を集めてノードにアナウンスするオフライン署名について説明します。
+ロック機構の章で、アナウンスしたトランザクションをハッシュ値指定でロックして、複数の署名（オンライン署名）を集めるアグリゲートトランザクションを紹介しました。  
+この章では、トランザクションを事前に署名を集めてノードにアナウンスするオフライン署名について説明します。  
 
 ### 手順
 
-Aliceが起案者となりトランザクションを作成し、署名します。
-次にBobが署名してAliceに返します。
-最後にAliceがトランザクションを結合してネットワークにアナウンスします。
+Aliceが起案者となりトランザクションを作成し、署名します。  
+次にBobが署名してAliceに返します。  
+最後にAliceがトランザクションを結合してネットワークにアナウンスします。  
 
 
 ### 12.1 トランザクション作成
@@ -45,8 +44,8 @@ signedHash = signedTx.hash;
 signedPayload = signedTx.payload;
 ```
 
-署名を行い、signedHash,signedPayloadを出力します。
-signedPayloadをBobに渡して署名を促します。
+署名を行い、signedHash,signedPayloadを出力します。  
+signedPayloadをBobに渡して署名を促します。  
 
 ### 12.2 Bobによる連署
 
@@ -59,13 +58,13 @@ bobSignedTxSignature = bobSignedTx.signature;
 bobSignedTxSignerPublicKey = bobSignedTx.signerPublicKey;
 ```
 
-CosignatureTransactionで署名を行い、bobSignedTxSignature,bobSignedTxSignerPublicKeyを出力しAliceに返却します。
-BobがAliceの作成したsignedHashを知っている場合はBobがアナウンスすることも可能です。
+CosignatureTransactionで署名を行い、bobSignedTxSignature,bobSignedTxSignerPublicKeyを出力しAliceに返却します。  
+BobがAliceの作成したsignedHashを知っている場合はBobがアナウンスすることも可能です。  
 
 ### 12.3 Aliceによるアナウンス
 
-AliceはBobからbobSignedTxSignature,bobSignedTxSignerPublicKeyを受け取ります。
-また事前に自分が作成したsignedHash,signedPayloadを用意します。
+AliceはBobからbobSignedTxSignature,bobSignedTxSignerPublicKeyを受け取ります。  
+また事前に自分が作成したsignedHash,signedPayloadを用意します。  
 
 ```js
 //BobがAliceの署名を添付
