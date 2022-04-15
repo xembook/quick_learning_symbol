@@ -1,12 +1,12 @@
-ブロックチェーンの情報を検証する方法について説明します。
+ブロックチェーン上に記録されたさまざまな情報を検証します。
 
 ## 13.1 トランザクションの検証
 
-トランザクションがブロックに含まれていることを検証します。
+トランザクションがブロックヘッダーに含まれていることを検証します。
 
 ### 検証するペイロード
 
-このペイロードの示すトランザクションが指定したブロック高(59639)でブロックチェーンに記録されていることを確認します。
+今回検証するトランザクションペイロードとそのトランザクションが記録されているとされるブロック高です。
 
 ```js
 payload = 'C00200000000000093B0B985101C1BDD1BC2BF30D72F35E34265B3F381ECA464733E147A4F0A6B9353547E2E08189EF37E50D271BEB5F09B81CE5816BB34A153D2268520AF630A0A0E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198414140770200000000002A769FB40000000076B455CFAE2CCDA9C282BF8556D3E9C9C0DE18B0CBE6660ACCF86EB54AC51B33B001000000000000DB000000000000000E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198544198205C1A4CE06C45B3A896B1B2360E03633B9F36BF7F22338B000000000000000066653465353435393833444430383935303645394533424446434235313637433046394232384135344536463032413837364535303734423641303337414643414233303344383841303630353343353345354235413835323835443639434132364235343233343032364244444331443133343139464435353438323930334242453038423832304100000000006800000000000000B2D4FD84B2B63A96AA37C35FC6E0A2341CEC1FD19C8FFC8D93CCCA2B028D1E9D000000000198444198205C1A4CE06C45B3A896B1B2360E03633B9F36BF7F2233BC089179EBBE01A81400140035383435344434373631364336433635373237396800000000000000B2D4FD84B2B63A96AA37C35FC6E0A2341CEC1FD19C8FFC8D93CCCA2B028D1E9D000000000198444198205C1A4CE06C45B3A896B1B2360E03633B9F36BF7F223345ECB996EDDB9BEB1400140035383435344434373631364336433635373237390000000000000000B2D4FD84B2B63A96AA37C35FC6E0A2341CEC1FD19C8FFC8D93CCCA2B028D1E9D5A71EBA9C924EFA146897BE6C9BB3DACEFA26A07D687AC4A83C9B03087640E2D1DDAE952E9DDBC33312E2C8D021B4CC0435852C0756B1EBD983FCE221A981D02';
@@ -14,24 +14,72 @@ height = 59639;
 ```
 
 
-### マークルコンポーネントハッシュの計算
+### payload確認
 
-トランザクションのハッシュ値には連署者の情報が含まれいません。  
-一方でブロックヘッダーに格納されるマークルルートはトランザクションのハッシュに連署者の情報が含まれたものが格納されます。  
-
+トランザクションの内容を確認します。
 
 ```js
 Buffer = require("/node_modules/buffer").Buffer;
-hash = sym.Transaction.createTransactionHash(payload,sym.Convert.hexToUint8(generationHash));
-tx = sym.TransactionMapping.createFromPayload(payload);
 
-var merkleComponentHash = hash;
+tx = sym.TransactionMapping.createFromPayload(payload);
+hash = sym.Transaction.createTransactionHash(payload,Buffer.from(generationHash, 'hex'));
+console.log(hash);
+console.log(tx);
+
+> 257E2CAECF4B477235CA93C37090E8BE58B7D3812A012E39B7B55BA7D7FFCB20
+> AggregateTransaction
+    > cosignatures: Array(1)
+      0: AggregateTransactionCosignature
+        signature: "5A71EBA9C924EFA146897BE6C9BB3DACEFA26A07D687AC4A83C9B03087640E2D1DDAE952E9DDBC33312E2C8D021B4CC0435852C0756B1EBD983FCE221A981D02"
+        signer: PublicAccount
+          address: Address {address: 'TAQFYGSM4BWELM5IS2Y3ENQOANRTXHZWX57SEMY', networkType: 152}
+          publicKey: "B2D4FD84B2B63A96AA37C35FC6E0A2341CEC1FD19C8FFC8D93CCCA2B028D1E9D"
+      deadline: Deadline {adjustedValue: 3030349354}
+    > innerTransactions: Array(3)
+        0: TransferTransaction {type: 16724, networkType: 152, version: 1, deadline: Deadline, maxFee: UInt64, …}
+        1: AccountMetadataTransaction {type: 16708, networkType: 152, version: 1, deadline: Deadline, maxFee: UInt64, …}
+        2: AccountMetadataTransaction {type: 16708, networkType: 152, version: 1, deadline: Deadline, maxFee: UInt64, …}
+      maxFee: UInt64 {lower: 161600, higher: 0}
+      networkType: 152
+      signature: "93B0B985101C1BDD1BC2BF30D72F35E34265B3F381ECA464733E147A4F0A6B9353547E2E08189EF37E50D271BEB5F09B81CE5816BB34A153D2268520AF630A0A"
+    > signer: PublicAccount
+        address: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+        publicKey: "0E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26"
+      transactionInfo: undefined
+      type: 16705
+```
+
+### 署名者の検証
+
+トランザクションがブロックに含まれていることが確認できれば自明ですが、  
+念のため、アカウントの公開鍵でトランザクションの署名を検証しておきます。
+
+```js
+res = alice.publicAccount.verifySignature(
+    tx.getSigningBytes([...Buffer.from(payload,'hex')],[...Buffer.from(generationHash,'hex')]),
+    "93B0B985101C1BDD1BC2BF30D72F35E34265B3F381ECA464733E147A4F0A6B9353547E2E08189EF37E50D271BEB5F09B81CE5816BB34A153D2268520AF630A0A"
+);
+console.log(res);
+
+> true
+```
+
+getSigningBytesで署名の対象となる部分だけを取り出しています。
+通常のトランザクションとアグリゲートトランザクションでは取り出す部分が異なるので注意が必要です。
+
+### マークルコンポーネントハッシュの計算
+
+トランザクションのハッシュ値には連署者の情報が含まれていません。  
+一方でブロックヘッダーに格納されるマークルルートはトランザクションのハッシュに連署者の情報が含めたものが格納されます。  
+そのためトランザクションがブロック内部に存在しているかどうかを検証する場合は、トランザクションハッシュをマークルコンポーネントハッシュに変換しておく必要があります。
+
+```js
+merkleComponentHash = hash;
 if( tx.cosignatures !== undefined && tx.cosignatures.length > 0){
   
   const hasher = sha3_256.create();
   hasher.update(Buffer.from(hash, 'hex'));
   for (cosignature of tx.cosignatures ){
-
     hasher.update(Buffer.from(cosignature.signer.publicKey, 'hex'));
   }
   merkleComponentHash = hasher.hex().toUpperCase();
@@ -42,10 +90,9 @@ console.log(merkleComponentHash);
 
 ```
 
-
 ### InBlockの検証
 
-マークルコンポーネントハッシュからブロックから取得したマークルツリーをたどってブロックヘッダーのマークルルートへ着けるか検証します。
+ノードからマークルツリーを取得し、先ほど計算したmerkleComponentHashからブロックヘッダーのマークルルートが導出できることを確認します。
 
 ```js
 function validateTransactionInBlock(leaf,HRoot,merkleProof){
@@ -81,20 +128,13 @@ console.log(result);
 > true
 ```
 
-
+トランザクションの情報がブロックヘッダーに含まれていることが確認できました。
 
 ## 13.2 ブロックヘッダーの検証
 
-ブロック高1からファイナライズブロックまで、すべてのノードが同じブロックヘッダーを共有しています。  
-ファイナライズブロックのハッシュ値計算に含まれる `前ブロックハッシュ値` を改ざんすることは困難なため、  
-前ブロックハッシュ値を計算結果とするブロックヘッダーヘッダーの存在が証明できます。  
-その仕組みでn番目のブロックからn-1番目のブロックヘッダーの存在を証明していくと、  
-特定のトランザクションのマークルルートを含むブロックヘッダーの存在が証明できます。  
-これにより特定のトランザクションがブロックチェーンに記録されていることが確認できます。  
+既知のブロックハッシュ値（例：ファイナライズブロック）から、検証中のブロックヘッダーまでたどれることを検証します。
 
-
-
-###### normalブロックの検証
+### normalブロックの検証
 
 ```js
 block = await blockRepo.getBlockByHeight(height).toPromise();
@@ -124,7 +164,23 @@ if(block.type ===  sym.BlockType.NormalBlock){
 }
 ```
 
-###### importanceブロックの検証
+true が出力されればこのブロックハッシュは前ブロックハッシュ値の存在を認知していることになります。
+同様にしてn番目のブロックがn-1番目のブロックを存在を確認し、最後に検証中のブロックにたどり着きます。
+
+これで、どのノードに問い合わせても確認可能な既知のファイナライズブロックが、
+検証したいブロックの存在に支えられていることが分かりました。
+これは、たとえブロックヘッダーと実体が一致しない気まぐれなノードから情報を取得したとしても
+そのほかのノード、そしてネットワーク全体が検証したいトランザクションを取り込んで同期している、と考えることができます。
+
+### importanceブロックの検証
+
+importanceBlockは、importance値の再計算が行われるブロック(720ブロック毎)です。
+NormalBlockに加えて以下の情報が追加されています。
+
+- votingEligibleAccountsCount
+- harvestingEligibleAccountsCount
+- totalVotingBalance
+- previousImportanceBlockHash
 
 ```js
 block = await blockRepo.getBlockByHeight(height).toPromise();
@@ -159,41 +215,51 @@ if(block.type ===  sym.BlockType.ImportanceBlock){
 }
 ```
 
-importanceBlockは、importance値の再計算が行われるブロックです。NormalBlockに加えてvotingEligibleAccountsCount,harvestingEligibleAccountsCount,totalVotingBalance,previousImportanceBlockHashの情報が追加されています。
+続くアカウント・メタデータの検証のために、stateHashSubCacheMerkleRootsを検証しておきます。
 
-###### stateHashの検証
+### stateHashの検証
 ```js
+console.log(block);
+
+> NormalBlockInfo
+    height: UInt64 {lower: 59639, higher: 0}
+    hash: "B5F765D388B5381AC93659F501D5C68C00A2EE7DF4548C988E97F809B279839B"
+    stateHash: "9D6801C49FE0C31ADE5C1BB71019883378016FA35230B9813CA6BB98F7572758"
+  > stateHashSubCacheMerkleRoots: Array(9)
+        0: "4578D33DD0ED5B8563440DA88F627BBC95A174C183191C15EE1672C5033E0572"
+        1: "2C76DAD84E4830021BE7D4CF661218973BA467741A1FC4663B54B5982053C606"
+        2: "259FB9565C546BAD0833AD2B5249AA54FE3BC45C9A0C64101888AC123A156D04"
+        3: "58D777F0AA670440D71FA859FB51F8981AF1164474840C71C1BEB4F7801F1B27"
+        4: "C9092F0652273166991FA24E8B115ACCBBD39814B8820A94BFBBE3C433E01733"
+        5: "4B53B8B0E5EE1EEAD6C1498CCC1D839044B3AE5F85DD8C522A4376C2C92D8324"
+        6: "132324AF5536EC9AA85B2C1697F6B357F05EAFC130894B210946567E4D4E9519"
+        7: "8374F46FBC759049F73667265394BD47642577F16E0076CBB7B0B9A92AAE0F8E"
+        8: "45F6AC48E072992343254F440450EF4E840D8386102AD161B817E9791ABC6F7F"
+
 hasher = sha3_256.create();
-
-hasher.update(sym.Convert.hexToUint8("4578D33DD0ED5B8563440DA88F627BBC95A174C183191C15EE1672C5033E0572"));
-hasher.update(sym.Convert.hexToUint8("2C76DAD84E4830021BE7D4CF661218973BA467741A1FC4663B54B5982053C606"));
-hasher.update(sym.Convert.hexToUint8("259FB9565C546BAD0833AD2B5249AA54FE3BC45C9A0C64101888AC123A156D04"));
-hasher.update(sym.Convert.hexToUint8("58D777F0AA670440D71FA859FB51F8981AF1164474840C71C1BEB4F7801F1B27"));
-hasher.update(sym.Convert.hexToUint8("C9092F0652273166991FA24E8B115ACCBBD39814B8820A94BFBBE3C433E01733"));
-hasher.update(sym.Convert.hexToUint8("4B53B8B0E5EE1EEAD6C1498CCC1D839044B3AE5F85DD8C522A4376C2C92D8324"));
-hasher.update(sym.Convert.hexToUint8("132324AF5536EC9AA85B2C1697F6B357F05EAFC130894B210946567E4D4E9519"));
-hasher.update(sym.Convert.hexToUint8("8374F46FBC759049F73667265394BD47642577F16E0076CBB7B0B9A92AAE0F8E"));
-hasher.update(sym.Convert.hexToUint8("45F6AC48E072992343254F440450EF4E840D8386102AD161B817E9791ABC6F7F"));
-
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[0],'hex')); //account
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[1],'hex')); //namespace
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[2],'hex'));
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[3],'hex'));
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[4],'hex'));
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[5],'hex'));
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[6],'hex'));
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[7],'hex'));
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[8],'hex'));
 hash = hasher.hex().toUpperCase();
+console.log(block.stateHash === hash);
+
+> true
 ```
-'9D6801C49FE0C31ADE5C1BB71019883378016FA35230B9813CA6BB98F7572758'
+
+ブロックヘッダーの検証に利用した9個のstateがstateHashSubCacheMerkleRootsから構成されていることがわかります。
+
 
 ## 13.3 アカウント・メタデータの検証
 
-トランザクションに紐づくアカウントやメタデータの存在を検証します。  
-トークンの存在や所有についてはトランザクションが承認されることで証明されますが、  
-そのトークンを送信するアカウントに紐づく情報、トークンやアカウントに紐づくメタデータに紐づく情報には別途検証が必要です。  
-トークンだけではなく、トークンを所有していたアカウントやメタデータに付随する価値が存在する場合、  
-トークンを交換する前に検証しておく必要があります。  
-
-
-### マークルパトリシアツリー
-
-検証にはマークルパトリシアツリーを用います。  
-トランザクションの承認の結果として蓄積されたデータの存在をツリー状に格納するためのデータ構造です。  
-マークルパトリシアツリーが、データから枝をたどり周知のブロックに帰着することが出来れば  
-
+マークルパトリシアツリーを利用して、トランザクションに紐づくアカウントやメタデータの存在を検証します。  
+アカウント情報やメタ情報は何度発生したトランザクションの蓄積結果としての情報です。
+それらの情報を変更するたびに記録しているのがマークルパトリシアツリーです。
 
 ### 検証用共通関数
 
@@ -281,7 +347,7 @@ checkState(stateProof,aliceStateHash,alicePathHash,rootHash);
 
 ### メタデータの検証
 
-###### モザイクへ登録したメタデータの検証
+### モザイクへ登録したメタデータの検証
 ```js
 
 srcAddress = sym.Convert.hexToUint8(
