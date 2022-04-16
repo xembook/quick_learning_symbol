@@ -1,4 +1,5 @@
 # 12.オフライン署名
+
 ロック機構の章で、アナウンスしたトランザクションをハッシュ値指定でロックして、  
 複数の署名（オンライン署名）を集めるアグリゲートトランザクションを紹介しました。    
 この章では、トランザクションを事前に署名を集めてノードにアナウンスするオフライン署名について説明します。  
@@ -43,6 +44,7 @@ aggregateTx = sym.AggregateTransaction.createComplete(
 signedTx =  alice.sign(aggregateTx,generationHash);
 signedHash = signedTx.hash;
 signedPayload = signedTx.payload;
+
 console.log(signedPayload);
 
 >580100000000000039A6555133357524A8F4A832E1E596BDBA39297BC94CD1D0728572EE14F66AA71ACF5088DB6F0D1031FF65F2BBA7DA9EE3A8ECF242C2A0FE41B6A00A2EF4B9020E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198414100AF000000000000D4641CD902000000306771D758886F1529F9B61664B0450ED138B27CC5E3AE579C16D550EDEE5791B00000000000000054000000000000000E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198544198A1BE13194C0D18897DD88FE3BC4860B8EEF79C6BC8C8720400000000000000007478310000000054000000000000003C4ADF83264FF73B4EC1DD05B490723A8CFFAE1ABBD4D4190AC4CAC1E6505A5900000000019854419850BF0FD1A45FCEE211B57D0FE2B6421EB81979814F629204000000000000000074783200000000
@@ -98,14 +100,15 @@ bobSignedTxSignerPublicKey = bobSignedTx.signerPublicKey;
 ```
 
 CosignatureTransactionで署名を行い、bobSignedTxSignature,bobSignedTxSignerPublicKeyを出力しAliceに返却します。  
-BobがAliceの作成したsignedHashを知っている場合はBobがアナウンスすることも可能です。  
+Bobが全ての署名を揃えられる場合は、Aliceに返却しなくてもBobがアナウンスすることも可能です。
 
 ### 12.3 Aliceによるアナウンス
 
 AliceはBobからbobSignedTxSignature,bobSignedTxSignerPublicKeyを受け取ります。  
-また事前に自分が作成したsignedHash,signedPayloadを用意します。  
+また事前にAlice自身で作成したsignedPayloadを用意します。  
 
 ```js
+signedHash = sym.Transaction.createTransactionHash(signedPayload,Buffer.from(generationHash, 'hex'));
 cosignSignedTxs = [
     new sym.CosignatureSignedTransaction(signedHash,bobSignedTxSignature,bobSignedTxSignerPublicKey)
 ];
@@ -131,3 +134,4 @@ await txRepo.announce(signedTx,listener).toPromise();
 ボンデッドトランザクションと異なりハッシュロックの費用を気にする必要がありません。  
 ペイロードを共有できる場が存在する場合は十分に利用価値があります。  
 ただ、オフラインで署名を交換するため、なりすましのペイロード署名要求には気を付けた方がいいでしょう。  
+（必ずペイロードからハッシュを生成して署名するようにしてください）
