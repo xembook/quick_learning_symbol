@@ -1,5 +1,5 @@
 # 11.制限
-アカウントに対する制限、モザイクのグローバルな振る舞いを制限する方法を紹介します。
+アカウントに対する制限、モザイクのグローバル制限についての方法を紹介します。
 
 ## 11.1 アカウント制限
 
@@ -48,10 +48,9 @@ await txRepo.announce(signedTx).toPromise();
 {2: 'AllowMosaic', 32770: 'BlockMosaic'}
 ```
 
-MosaicRestrictionFlagにはAllowMosaicとBlockMosaicが使用できます。
-
 - AllowMosaic：指定モザイクを含むトランザクションのみ受信許可
 - BlockMosaic：指定モザイクを含むトランザクションを受信拒否となります。
+
 モザイク送信の制限機能はありません。
 
 ### 指定トランザクションの送信制限
@@ -68,16 +67,15 @@ signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-
 ##### OperationRestrictionFlag
 ```js
 {16388: 'AllowOutgoingTransactionType', 49156: 'BlockOutgoingTransactionType'}
 ```
-OperationRestrictionFlagにはAllowOutgoingTransactionTypeとBlockOutgoingTransactionTypeが使用できます。
+
 - AllowOutgoingTransactionType：指定トランザクションの送信のみ許可
 - BlockOutgoingTransactionType：指定トランザクションの送信を禁止
 
-指定できるオペレーションは以下の通りです。トランザクション受信の制限機能はありません。
+トランザクション受信の制限機能はありません。指定できるオペレーションは以下の通りです。
 
 ##### TransactionType
 ```js
@@ -86,15 +84,13 @@ OperationRestrictionFlagにはAllowOutgoingTransactionTypeとBlockOutgoingTransa
 17232: 'ACCOUNT_OPERATION_RESTRICTION' の制限は許可されていません
 ```
 
-
-
-
 ### 確認
 
 設定した制限情報を確認します
 
 ```js
-await resAccountRepo.getAccountRestrictions(alice.address).toPromise();
+res = await resAccountRepo.getAccountRestrictions(alice.address).toPromise();
+console.log(res);
 
 > AccountRestrictions
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
@@ -112,21 +108,24 @@ await resAccountRepo.getAccountRestrictions(alice.address).toPromise();
 
 ## 11.2 グローバルモザイク制限
 
-グローバルモザイク制限はアカウントに対してではなく、モザイクに対して制限を行います。
+グローバルモザイク制限はモザイクに対して送信可能な条件を設定します。
+その後、各アカウントに対してグローバルモザイク制限専用の数値メタデータを付与します。
+送信アカウント、受信アカウント相互に条件を満たした場合のみ、該当モザイクを送信することができます。
 
-### モザイク作成
+
+### グローバル制限機能つきモザイクの作成
 ```js
-isSupplyMutable = true;
-isTransferable = true;
-isRestrictable = true;
-isRevokable = false;
+upplyMutable = true;
+transferable = true;
+restrictable = true;
+revokable = true;
 
 nonce = sym.MosaicNonce.createRandom();
 mosaicDefTx = sym.MosaicDefinitionTransaction.create(
     undefined,
     nonce,
     sym.MosaicId.createFromNonce(nonce, alice.address),
-    sym.MosaicFlags.create(isSupplyMutable, isTransferable, isRestrictable, isRevokable),
+    sym.MosaicFlags.create(upplyMutable, transferable, restrictable, revokable),
     0,//divisibility
     sym.UInt64.fromUint(0), //duration
     networkType
@@ -152,7 +151,6 @@ mosaicGlobalResTx = await mosaicResService.createMosaicGlobalRestrictionTransact
     sym.MosaicRestrictionType.EQ,
 ).toPromise();
 
-
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
     [
@@ -164,9 +162,8 @@ aggregateTx = sym.AggregateTransaction.createComplete(
 ).setMaxFeeForAggregate(100, 0);
 
 signedTx = alice.sign(aggregateTx,generationHash);
-txRepo.announce(signedTx).subscribe(x=>console.log(x));
+await txRepo.announce(signedTx).toPromise();
 ```
-
 
 ##### MosaicRestrictionType
 
@@ -186,12 +183,28 @@ txRepo.announce(signedTx).subscribe(x=>console.log(x));
 
 ### アカウントへのモザイク制限適用
 
-Bobに対してモザイク制限を追加します。
+Alice,Bobに対してグローバル制限モザイクに対しての適格情報を追加します。
+送信・受信についてかかる制限なので、すでに所有しているモザイク量についての制限はありません。
+送信を成功させるためには、送信者・受信者双方が条件をクリアしている必要があります。
+モザイク作成者の秘密鍵があればどのアカウントに対しても許可なく制限をつけることができます。
 
 ```js
+//Aliceに適用
+aliceMosaicAddressResTx =  sym.MosaicAddressRestrictionTransaction.create(
+    sym.Deadline.create(epochAdjustment),
+    mosaicDefTx.mosaicId, // mosaicId
+    sym.KeyGenerator.generateUInt64Key("KYC"), // restrictionKey
+    alice.address, // address
+    sym.UInt64.fromUint(1), // newRestrictionValue
+    networkType,
+    sym.UInt64.fromHex('FFFFFFFFFFFFFFFF') //previousRestrictionValue
+).setMaxFee(100);
+signedTx = alice.sign(aliceMosaicAddressResTx,generationHash);
+await txRepo.announce(signedTx).toPromise();
 
+//Bobに適用
 bob = sym.Account.generateNewAccount(networkType);
-mosaicAddressRestrictionTx =  sym.MosaicAddressRestrictionTransaction.create(
+bobMosaicAddressResTx =  sym.MosaicAddressRestrictionTransaction.create(
     sym.Deadline.create(epochAdjustment),
     mosaicDefTx.mosaicId, // mosaicId
     sym.KeyGenerator.generateUInt64Key("KYC"), // restrictionKey
@@ -200,15 +213,13 @@ mosaicAddressRestrictionTx =  sym.MosaicAddressRestrictionTransaction.create(
     networkType,
     sym.UInt64.fromHex('FFFFFFFFFFFFFFFF') //previousRestrictionValue
 ).setMaxFee(100);
-
-signedTx = alice.sign(mosaicAddressRestrictionTx,generationHash);
-txRepo.announce(signedTx).subscribe(x=>console.log(x));
-
+signedTx = alice.sign(bobMosaicAddressResTx,generationHash);
+await txRepo.announce(signedTx).toPromise();
 ```
 
+### 制限状態確認
 
-
-### 確認
+ノードに問い合わせて限状態を確認します。
 
 ```js
 res = await resMosaicRepo.search({mosaicId:mosaicDefTx.mosaicId}).toPromise();
@@ -223,11 +234,8 @@ console.log(res);
     > restrictions: Array(1)
         0: MosaicGlobalRestrictionItem
           key: UInt64 {lower: 2424036727, higher: 2165465980}
-          referenceMosaicId: MosaicId {id: Id}
           restrictionType: 1
           restrictionValue: UInt64 {lower: 1, higher: 0}
-          length: 1
-          version: 1
 	> 1: MosaicAddressRestriction
       compositeHash: "920BFD041B6D30C0799E06585EC5F3916489E2DDF47FF6C30C569B102DB39F4E"
       entryType: 0
@@ -238,8 +246,44 @@ console.log(res);
           key: UInt64 {lower: 2424036727, higher: 2165465980}
           restrictionValue: UInt64 {lower: 1, higher: 0}
           targetAddress: Address {address: 'TAZCST2RBXDSD3227Y4A6ZP3QHFUB2P7JQVRYEI', networkType: 152}
+  > 2: MosaicAddressRestriction
+  ...
 ```
 
+### 送信確認
+
+実際にモザイクを送信してみて、制限状態を確認します。
+
+```js
+//成功
+trTx = sym.TransferTransaction.create(
+        sym.Deadline.create(epochAdjustment),
+        bob.address, 
+        [new sym.Mosaic(mosaicDefTx.mosaicId, sym.UInt64.fromUint(1))],
+        sym.PlainMessage.create(""),
+        networkType
+      ).setMaxFee(100);
+signedTx = alice.sign(trTx,generationHash);
+await txRepo.announce(signedTx).toPromise();
+
+//失敗
+carol = sym.Account.generateNewAccount(networkType);
+trTx = sym.TransferTransaction.create(
+        sym.Deadline.create(epochAdjustment),
+        carol.address, 
+        [new sym.Mosaic(mosaicDefTx.mosaicId, sym.UInt64.fromUint(1))],
+        sym.PlainMessage.create(""),
+        networkType
+      ).setMaxFee(100);
+signedTx = alice.sign(trTx,generationHash);
+await txRepo.announce(signedTx).toPromise();
+```
+
+失敗した場合以下のようなエラーステータスになります。
+
+```js
+{"hash":"E3402FB7AE21A6A64838DDD0722420EC67E61206C148A73B0DFD7F8C098062FA","code":"Failure_RestrictionMosaic_Account_Unauthorized","deadline":"12371602742","group":"failed"}
+```
 
 ## 11.3 今日から現場で使えるTIPS
 
@@ -249,6 +293,11 @@ AllowIncomingAddressによって指定アドレスからのみ受信可能にし
 手数料に使用するトークンを全量送信すると、秘密鍵を持っていても操作困難なアカウントを明示的に作成することができます。
 （最小手数料を0に設定したノードによって承認される可能性はあります。）
 
+### モザイクロック
+譲渡不可設定のモザイクを配布し、配布者側のアカウントで受け取り拒否を行うと動かすことのできないモザイクを作ることができます。
 
-### トークンロック
-トークンを譲渡不可のトークンをに設定しておき、指定モザイクの受信拒否設定を行うことで動かせないトークンを作成できます。
+### 独自経済圏
+KYC済みのアカウント間でのみ流通可能なモザイクを作成することができます。
+
+### オプトイン署名不要なメタデータ
+MosaicAddressRestrictionを利用して任意のアカウントに対し、許可なしで数値のメタデータを付与することができます。
