@@ -1,5 +1,4 @@
 # 13.検証
-
 ブロックチェーン上に記録されたさまざまな情報を検証します。
 
 ## 13.1 トランザクションの検証
@@ -237,15 +236,15 @@ console.log(block);
         8: "45F6AC48E072992343254F440450EF4E840D8386102AD161B817E9791ABC6F7F"
 
 hasher = sha3_256.create();
-hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[0],'hex')); //account
-hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[1],'hex')); //namespace
-hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[2],'hex'));
-hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[3],'hex'));
-hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[4],'hex'));
-hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[5],'hex'));
-hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[6],'hex'));
-hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[7],'hex'));
-hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[8],'hex'));
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[0],'hex')); //AccountState
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[1],'hex')); //Namespace
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[2],'hex')); //Mosaic
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[3],'hex')); //Multisig
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[4],'hex')); //HashLockInfo
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[5],'hex')); //SecretLockInfo
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[6],'hex')); //AccountRestriction
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[7],'hex')); //MosaicRestriction
+hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[8],'hex')); //Metadata
 hash = hasher.hex().toUpperCase();
 console.log(block.stateHash === hash);
 
