@@ -1,8 +1,5 @@
 # 10.監視
-SymbolのノードはREST APIの他にWebSocket通信で情報を取得することが可能です。  
-WebSocketを利用することでブロックチェーンの状態をアプリケーション側でキャッシュしておく必要なく状態変化を検知することが可能です。  
-
-ノードは1分間経過するとリスナーの接続を切断するのでご注意ください。  
+SymbolのノードはWebSocket通信でブロックチェーンの状態変化を監視することが可能です。  
 
 ## 10.1 リスナー設定
 
@@ -12,10 +9,18 @@ WebSocketを生成してリスナーの設定を行います。
 nsRepo = repo.createNamespaceRepository();
 wsEndpoint = NODE.replace('http', 'ws') + "/ws";
 listener = new sym.Listener(wsEndpoint,nsRepo,WebSocket);
+listener.open();
 ```
 
+エンドポイントのフォーマットは以下の通りです。
+- wss://{node url}:3001/ws
+
+何も通信が無ければ、listenerは1分で切断されます。
 
 ## 10.1 受信検知
+
+アカウントが受信したトランザクションを検知します。
+
 ```js
 listener.open().then(() => {
 
@@ -58,6 +63,9 @@ listener.open().then(() => {
 未承認トランザクションは transactionInfo.height=0　で受信します。
 
 ## 10.2 ブロック監視
+
+新規に生成されたブロックを検知します。
+
 ```js
 listener.open().then(() => {
 
@@ -93,6 +101,9 @@ listener.newBlock()をしておくと、約30秒ごとに通信が発生する�
 まれに、ブロック生成が1分を超える場合があるのでその場合はリスナーを再接続する必要があります。  
 
 ## 10.3 署名要求
+
+署名が必要なトランザクションが発生すると検知します。
+
 ```js
 listener.open().then(() => {
     //ブロック生成の検知
@@ -121,12 +132,16 @@ listener.open().then(() => {
 
 ```
 
+指定アドレスが関係するすべてのアグリゲートトランザクションが検知されます。
+連署が必要かどうかは別途フィルターして判断します。
+
 
 ## 10.4 現場で使えるヒント
 ### 常時コネクション
 
 一覧からランダムに選択し、接続を試みます。
 
+##### ノードへの接続
 ```js
 //ノード一覧
 NODES = ["https://node.com:3001",...];
@@ -169,7 +184,11 @@ function connectNode(nodes) {
 }
 ```
 
+タイムアウト値を設定しておき、応答の悪いノードに接続した場合は選びなおします。
+エンドポイント /node/health　を確認してステータス異常の場合はノードを選びなおします。
 
+
+##### レポジトリの作成
 ```js
 function createRepo(nodes){
 
@@ -187,7 +206,11 @@ function createRepo(nodes){
     });
 }
 ```
+まれに /network/properties のエンドポイントが解放されていないノードが存在するため、
+getEpochAdjustment() の情報を取得いてチェックを行います。取得できない場合は再帰的にcreateRepoを読み込みます。
 
+
+##### リスナーの常時接続
 ```js
 async function listenerKeepOpening(nodes){
 
@@ -211,6 +234,9 @@ async function listenerKeepOpening(nodes){
 }
 ```
 
+リスナーがcloseした場合は再接続します。
+
+##### リスナー開始
 ```js
 listener = await listenerKeepOpening(NODES);
 ```
