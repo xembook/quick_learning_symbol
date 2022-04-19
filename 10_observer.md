@@ -19,19 +19,19 @@ listener = new sym.Listener(wsEndpoint,nsRepo,WebSocket);
 ```js
 listener.open().then(() => {
 
-  //承認トランザクションの検知
-  listener.confirmed(alice.address)
-  .subscribe(tx=>{
-    //受信後の処理を記述
-    console.log(tx);
-  });
-  
-  //未承認トランザクションの検知
-	listener.unconfirmedAdded(alice.address)
-	.subscribe(tx=>{
-    //受信後の処理を記述
-    console.log(tx);
-  });
+    //承認トランザクションの検知
+    listener.confirmed(alice.address)
+    .subscribe(tx=>{
+        //受信後の処理を記述
+        console.log(tx);
+    });
+
+    //未承認トランザクションの検知
+    listener.unconfirmedAdded(alice.address)
+    .subscribe(tx=>{
+        //受信後の処理を記述
+        console.log(tx);
+    });
 });
 
 > Promise {<pending>}
@@ -46,11 +46,11 @@ listener.open().then(() => {
     signature: "914B625F3013635FA9C99B2F138C47CD75F6E1DF7BDDA291E449390178EB461AA389522FA126D506405163CC8BA51FA9019E0522E3FA9FED7C2F857F11FBCC09"
     signer: PublicAccount {publicKey: 'D4933FC1E4C56F9DF9314E9E0533173E1AB727BDB2A04B59F048124E93BEFBD2', address: Address}
     transactionInfo: TransactionInfo
-      hash: "3B21D8842EB70A780A662CCA19B8B030E2D5C7FB4C54BDA8B3C3760F0B35FECE"
-      height: UInt64 {lower: 316771, higher: 0}
-      id: undefined
-      index: undefined
-      merkleComponentHash: "3B21D8842EB70A780A662CCA19B8B030E2D5C7FB4C54BDA8B3C3760F0B35FECE"
+        hash: "3B21D8842EB70A780A662CCA19B8B030E2D5C7FB4C54BDA8B3C3760F0B35FECE"
+        height: UInt64 {lower: 316771, higher: 0}
+        id: undefined
+        index: undefined
+        merkleComponentHash: "3B21D8842EB70A780A662CCA19B8B030E2D5C7FB4C54BDA8B3C3760F0B35FECE"
     type: 16724
     version: 1
 ```
@@ -61,9 +61,9 @@ listener.open().then(() => {
 ```js
 listener.open().then(() => {
 
-  //ブロック生成の検知
-  listener.newBlock()
-  .subscribe(block=>console.log(block));
+    //ブロック生成の検知
+    listener.newBlock()
+    .subscribe(block=>console.log(block));
 });
 
 > Promise {<pending>}
@@ -132,40 +132,40 @@ listener.open().then(() => {
 NODES = ["https://node.com:3001",...];
 
 function connectNode(nodes) {
-	const node = nodes[Math.floor(Math.random() * nodes.length)] ;
-	console.log("try:" + node);
+    const node = nodes[Math.floor(Math.random() * nodes.length)] ;
+    console.log("try:" + node);
 
-	return new Promise((resolve, reject) => {
-		let req = new XMLHttpRequest();
-		req.timeout = 2000;
-		req.open('GET', node + "/node/health", true);
-		req.onload = function() {
-			if (req.status === 200) {
-				const status = JSON.parse(req.responseText).status;
-				if(status.apiNode == "up" && status.db == "up"){
-					return resolve(node);
-				}else{
-					console.log("fail node status:" + status);
-					return connectNode(nodes).then(node => resolve(node));
-				}
-			} else {
-				console.log("fail request status:" + req.status)
-				return connectNode(nodes).then(node => resolve(node));
-			}
-		};
+    return new Promise((resolve, reject) => {
+        let req = new XMLHttpRequest();
+        req.timeout = 2000;
+        req.open('GET', node + "/node/health", true);
+        req.onload = function() {
+            if (req.status === 200) {
+                const status = JSON.parse(req.responseText).status;
+                if(status.apiNode == "up" && status.db == "up"){
+                    return resolve(node);
+                }else{
+                    console.log("fail node status:" + status);
+                    return connectNode(nodes).then(node => resolve(node));
+                }
+            } else {
+                console.log("fail request status:" + req.status)
+                return connectNode(nodes).then(node => resolve(node));
+            }
+        };
 
-		req.onerror = function(e) {
-			console.log("onerror:" + e)
-			return connectNode(nodes).then(node => resolve(node));
-		};
+        req.onerror = function(e) {
+            console.log("onerror:" + e)
+            return connectNode(nodes).then(node => resolve(node));
+        };
 
-		req.ontimeout = function (e) {
-			console.log("ontimeout")
-			return connectNode(nodes).then(node => resolve(node));
-		};	
+        req.ontimeout = function (e) {
+            console.log("ontimeout")
+            return connectNode(nodes).then(node => resolve(node));
+        };  
 
     req.send();
-	});
+    });
 }
 ```
 
@@ -191,22 +191,22 @@ function createRepo(nodes){
 ```js
 async function listenerKeepOpening(nodes){
 
-  const repo = await createRepo(NODES);
-	let wsEndpoint = repo.url.replace('http', 'ws') + "/ws";
-	const nsRepo = repo.createNamespaceRepository();
-	const lner = new sym.Listener(wsEndpoint,nsRepo,WebSocket);
-  try{
-      await lner.open();
-      listener.newBlock();
-  }catch(e){
-      console.log("fail websocket");
-      return await listenerKeepOpening(nodes);
-  }
+    const repo = await createRepo(NODES);
+    let wsEndpoint = repo.url.replace('http', 'ws') + "/ws";
+    const nsRepo = repo.createNamespaceRepository();
+    const lner = new sym.Listener(wsEndpoint,nsRepo,WebSocket);
+    try{
+        await lner.open();
+        listener.newBlock();
+    }catch(e){
+        console.log("fail websocket");
+        return await listenerKeepOpening(nodes);
+    }
 
-	lner.webSocket.onclose = async function(){
-		console.log("listener onclose");
-		return await listenerKeepOpening(nodes);
-	}
+    lner.webSocket.onclose = async function(){
+        console.log("listener onclose");
+        return await listenerKeepOpening(nodes);
+    }
   return lner;
 }
 ```
@@ -225,25 +225,25 @@ listener = await listenerKeepOpening(NODES);
 bondedListener = listener.aggregateBondedAdded(bob.address);
 bondedHttp = txRepo.search({address:bob.address,group:sym.TransactionGroup.Partial})
 .pipe(
-	op.delay(2000),
-	op.mergeMap(page => page.data)
+    op.delay(2000),
+    op.mergeMap(page => page.data)
 );
 
 //選択中アカウントの完了トランザクション検知リスナー
 const statusChanged = function(address,hash){
 
-	const transactionObservable = listener.confirmed(address);
-	const errorObservable = listener.status(address, hash);
-	return rxjs.merge(transactionObservable, errorObservable).pipe(
-		op.first(),
-		op.map((errorOrTransaction) => {
-			if (errorOrTransaction.constructor.name === "TransactionStatusError") {
-				throw new Error(errorOrTransaction.code);
-			} else {
-				return errorOrTransaction;
-			}
-		}),
-	);
+    const transactionObservable = listener.confirmed(address);
+    const errorObservable = listener.status(address, hash);
+    return rxjs.merge(transactionObservable, errorObservable).pipe(
+        op.first(),
+        op.map((errorOrTransaction) => {
+            if (errorOrTransaction.constructor.name === "TransactionStatusError") {
+                throw new Error(errorOrTransaction.code);
+            } else {
+                return errorOrTransaction;
+            }
+        }),
+    );
 }
 
 //連署実行
@@ -270,16 +270,16 @@ function exeAggregateBondedCosignature(tx){
 }
 
 bondedSubscribe = function(observer){
-	observer.pipe(
+    observer.pipe(
 
-		//すでに署名済みでない場合
-		op.filter(tx => {
-			return !tx.signedByAccount(sym.PublicAccount.createFromPublicKey(bob.publicKey ,networkType));
-		})
-	).subscribe(tx=>{
-    console.log(tx);
-    exeAggregateBondedCosignature(tx);
-	});
+        //すでに署名済みでない場合
+        op.filter(tx => {
+            return !tx.signedByAccount(sym.PublicAccount.createFromPublicKey(bob.publicKey ,networkType));
+        })
+    ).subscribe(tx=>{
+        console.log(tx);
+        exeAggregateBondedCosignature(tx);
+    });
 }
 
 bondedSubscribe(bondedListener);
