@@ -158,10 +158,10 @@ signedAggregateTx = carol1.sign(aggregateTx, generationHash);
 
 hashLockTx = sym.HashLockTransaction.create(
   sym.Deadline.create(epochAdjustment),
-	networkCurrency.createRelative(10), //固定値:10XYM
-	sym.UInt64.fromUint(480),
-	signedAggregateTx,
-	networkType
+    networkCurrency.createRelative(10), //固定値:10XYM
+    sym.UInt64.fromUint(480),
+    signedAggregateTx,
+    networkType
 ).setMaxFee(100);
 
 signedLockTx = carol1.sign(hashLockTx, generationHash);
@@ -183,45 +183,45 @@ console.log(txInfo);
 
 > AggregateTransaction
   > cosignatures: Array(2)
-		0: AggregateTransactionCosignature
-			signature: "554F3C7017C32FD4FE67C1E5E35DD21D395D44742B43BD1EF99BC8E9576845CDC087B923C69DB2D86680279253F2C8A450F97CC7D3BCD6E86FE4E70135D44B06"
-			signer: PublicAccount
-				address: Address {address: 'TB3XP4GQK6XH2SSA2E2U6UWCESNACK566DS4COY', networkType: 152}
-				publicKey: "A1BA266B56B21DC997D637BCC539CCFFA563ABCB34EAA52CF90005429F5CB39C"
-		1: AggregateTransactionCosignature
-			signature: "AD753E23D3D3A4150092C13A410D5AB373B871CA74D1A723798332D70AD4598EC656F580CB281DB3EB5B9A7A1826BAAA6E060EEA3CC5F93644136E9B52006C05"
-			signer: PublicAccount
-				address: Address {address: 'TBAFGZOCB7OHZCCYYV64F2IFZL7SOOXNDHFS5NY', networkType: 152}
-				publicKey: "B00721EDD76B24E3DDCA13555F86FC4BDA89D413625465B1BD7F347F74B82FF0"
-	deadline: Deadline {adjustedValue: 12619660047}
+        0: AggregateTransactionCosignature
+            signature: "554F3C7017C32FD4FE67C1E5E35DD21D395D44742B43BD1EF99BC8E9576845CDC087B923C69DB2D86680279253F2C8A450F97CC7D3BCD6E86FE4E70135D44B06"
+            signer: PublicAccount
+                address: Address {address: 'TB3XP4GQK6XH2SSA2E2U6UWCESNACK566DS4COY', networkType: 152}
+                publicKey: "A1BA266B56B21DC997D637BCC539CCFFA563ABCB34EAA52CF90005429F5CB39C"
+        1: AggregateTransactionCosignature
+            signature: "AD753E23D3D3A4150092C13A410D5AB373B871CA74D1A723798332D70AD4598EC656F580CB281DB3EB5B9A7A1826BAAA6E060EEA3CC5F93644136E9B52006C05"
+            signer: PublicAccount
+                address: Address {address: 'TBAFGZOCB7OHZCCYYV64F2IFZL7SOOXNDHFS5NY', networkType: 152}
+                publicKey: "B00721EDD76B24E3DDCA13555F86FC4BDA89D413625465B1BD7F347F74B82FF0"
+    deadline: Deadline {adjustedValue: 12619660047}
   > innerTransactions: Array(1)
-	  >	0: TransferTransaction
-			deadline: Deadline {adjustedValue: 12619660047}
-			maxFee: UInt64 {lower: 48000, higher: 0}
-			message: PlainMessage {type: 0, payload: 'test'}
-			mosaics: [Mosaic]
-			networkType: 152
-			payloadSize: undefined
-			recipientAddress: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
-			signature: "670EA8CFA4E35604DEE20877A6FC95C2786D748A8449CE7EEA7CB941FE5EC181175B0D6A08AF9E99955640C872DAD0AA68A37065C866EE1B651C3CE28BA95404"
-			signer: PublicAccount
-				address: Address {address: 'TCOMA5VG67TZH4X55HGZOXOFP7S232CYEQMOS7Q', networkType: 152}
-				publicKey: "4667BC99B68B6CA0878CD499CE89CDEB7AAE2EE8EB96E0E8656386DECF0AD657"
-			transactionInfo: AggregateTransactionInfo {height: UInt64, index: 0, id: '62600A8C0A21EB5CD28679A4', hash: undefined, merkleComponentHash: undefined, …}
-			type: 16724
-	maxFee: UInt64 {lower: 48000, higher: 0}
-	networkType: 152
-	payloadSize: 480
-	signature: "670EA8CFA4E35604DEE20877A6FC95C2786D748A8449CE7EEA7CB941FE5EC181175B0D6A08AF9E99955640C872DAD0AA68A37065C866EE1B651C3CE28BA95404"
-  >	signer: PublicAccount
-		address: Address {address: 'TCV67BMTD2JMDQOJUDQHBFJHQPG4DAKVKST3YJI', networkType: 152}
-		publicKey: "FF9595FDCD983F46FF9AE0F7D86D94E9B164E385BD125202CF16528F53298656"
-  >	transactionInfo: 
-		hash: "AA99F8F4000F989E6F135228829DB66AEB3B3C4B1F06BA77D373D042EAA4C8DA"
-		height: UInt64 {lower: 322376, higher: 0}
-		id: "62600A8C0A21EB5CD28679A3"
-		merkleComponentHash: "1FD6340BCFEEA138CC6305137566B0B1E98DEDE70E79CC933665FE93E10E0E3E"
-	type: 16705
+      > 0: TransferTransaction
+            deadline: Deadline {adjustedValue: 12619660047}
+            maxFee: UInt64 {lower: 48000, higher: 0}
+            message: PlainMessage {type: 0, payload: 'test'}
+            mosaics: [Mosaic]
+            networkType: 152
+            payloadSize: undefined
+            recipientAddress: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
+            signature: "670EA8CFA4E35604DEE20877A6FC95C2786D748A8449CE7EEA7CB941FE5EC181175B0D6A08AF9E99955640C872DAD0AA68A37065C866EE1B651C3CE28BA95404"
+            signer: PublicAccount
+                address: Address {address: 'TCOMA5VG67TZH4X55HGZOXOFP7S232CYEQMOS7Q', networkType: 152}
+                publicKey: "4667BC99B68B6CA0878CD499CE89CDEB7AAE2EE8EB96E0E8656386DECF0AD657"
+            transactionInfo: AggregateTransactionInfo {height: UInt64, index: 0, id: '62600A8C0A21EB5CD28679A4', hash: undefined, merkleComponentHash: undefined, …}
+            type: 16724
+    maxFee: UInt64 {lower: 48000, higher: 0}
+    networkType: 152
+    payloadSize: 480
+    signature: "670EA8CFA4E35604DEE20877A6FC95C2786D748A8449CE7EEA7CB941FE5EC181175B0D6A08AF9E99955640C872DAD0AA68A37065C866EE1B651C3CE28BA95404"
+  > signer: PublicAccount
+        address: Address {address: 'TCV67BMTD2JMDQOJUDQHBFJHQPG4DAKVKST3YJI', networkType: 152}
+        publicKey: "FF9595FDCD983F46FF9AE0F7D86D94E9B164E385BD125202CF16528F53298656"
+  > transactionInfo: 
+        hash: "AA99F8F4000F989E6F135228829DB66AEB3B3C4B1F06BA77D373D042EAA4C8DA"
+        height: UInt64 {lower: 322376, higher: 0}
+        id: "62600A8C0A21EB5CD28679A3"
+        merkleComponentHash: "1FD6340BCFEEA138CC6305137566B0B1E98DEDE70E79CC933665FE93E10E0E3E"
+    type: 16705
 ```
 
 - マルチシグアカウント
