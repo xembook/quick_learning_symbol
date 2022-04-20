@@ -16,7 +16,7 @@ tx1 = sym.TransferTransaction.create(
     bob.address, 
     [networkCurrency.createRelative(1)],
     sym.EmptyMessage,
-    0
+    networkType
 );
 
 tx2 = sym.TransferTransaction.create(
@@ -24,7 +24,7 @@ tx2 = sym.TransferTransaction.create(
     alice.address, 
     [networkCurrency.createRelative(2)],
     sym.PlainMessage.create('test'),
-    0
+    networkType
 );
 
 aggregateArray = [
@@ -97,23 +97,3 @@ signedProofTx = carol.sign(proofTx,generationHash);
 txRepo.announce(signedProofTx).subscribe(x=>console.log(x));
 
 ```
-
-
-## 今日から現場で使えるヒント
-### 手数料代払い
-
-ハッシュロックは誰が発行しても問題ありません。
-ただし、ロックされたアグリゲートトランザクションの内部にハッシュロックしたアカウントが含まれている必要があります。
-ユーザがXYMを所有しない場合、ハッシュロック費用とネットワーク手数料をサービス提供者が負担することで送信を実現することができます。
-
-### タイマー送金
-
-シークレットロックは指定ブロック数を経過すると元のアカウントへ払い戻されます。
-この原理を利用して、シークレットロックしたアカウントにたいしてロック分の費用をサービス提供者が充足しておけば、
-期限が過ぎた後ユーザ側がロック分のトークン所有量が増加することになります。
-一方で、期限が過ぎる前にシークレット証明トランザクションをアナウンスすると、送信が完了し、サービス提供者に充当戻るためキャンセル扱いとなります。
-
-### テスト環境からのアトミックスワップ
-シークレットロックは他のチェーンとのアトミックスワップを実現します。
-とりあえずテスト環境で始めたトークン運用を、評判の確認や法制度の対応をしてからメインチェーンにアトミックスワップすることができます。
-テスト環境は年に数回リセットされる可能性があります。
