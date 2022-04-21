@@ -238,6 +238,7 @@ receiptInfo = await receiptRepo.searchReceipts({
 console.log(receiptInfo.data);
 ```
 
+出力例
 ```js
 > data: Array(1)
   >  0: TransactionStatement
@@ -264,3 +265,5 @@ ReceiptTypeは以下の通りです。
 ## 現場で使えるヒント
 
 (現在執筆中)
+
+
