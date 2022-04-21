@@ -1,37 +1,43 @@
-# 08.ロック
+# 8.ロック
 
-Symbolブロックチェーンにはハッシュロックとシークレットロックの２種類のロック機構があります。
-ハッシュロックはトランザクションのロックで、必要な署名が全て揃うまでトランザクションをロックしてブロック承認を保留し、
-シークレットロックはモザイクのロックで、受信者が共通パスワードの所有を証明するまで指定された送信者のモザイク送信量をロックして保留します。
-
-前者のハッシュロックは、複数のトランザクションを1ブロックで完結するために複数人の署名を待つアグリゲートトランザクションを実現し、
-後者のシークレットロックは異なるチェーン間でのアトミックスワップを実現します。
+Symbolブロックチェーンにはハッシュロックとシークレットロックの２種類のロック機構があります。  
 
 ## ハッシュロック
 
-### アグリゲートボンデッドトランザクション
+ハッシュロックは事前に後でアナウンスされる予定のトランザクションをハッシュ値で登録しておくことで、、
+該当トランザクションがアナウンスされた場合に、そのトランザクションを処理せずにノード上にロックさせて、署名が集まってから処理を行うことができます。
+ロック対象はトランザクションでアカウント所有モザイクの一部をロックするわけではありません。
+ハッシュロックの有効期限は最大48時間です。
+
+### アグリゲートボンデッドトランザクションの作成
 ```js
 tx1 = sym.TransferTransaction.create(
     undefined,
-    bob.address, 
-    [networkCurrency.createRelative(1)],
-    sym.EmptyMessage,
+    bob.address,  //Bobへの送信
+    [ //1XYM
+      new nem.Mosaic(
+        new nem.NamespaceId("symbol.xym"),
+        nem.UInt64.fromUint(1000000)
+      )
+    ],
+    sym.EmptyMessage, //メッセージ無し
     networkType
 );
 
 tx2 = sym.TransferTransaction.create(
     undefined,
-    alice.address, 
-    [networkCurrency.createRelative(2)],
-    sym.PlainMessage.create('test'),
+    alice.address,  // Aliceへの送信
+    [],
+    sym.PlainMessage.create('thank you!'), //メッセージ
     networkType
 );
 
 aggregateArray = [
-    tx1.toAggregate(alice.publicAccount),
-    tx2.toAggregate(bob.publicAccount),
+    tx1.toAggregate(alice.publicAccount), //Aliceからの送信
+    tx2.toAggregate(bob.publicAccount), // Bobからの送信
 ]
 
+//アグリゲートボンデッドトランザクション
 aggregateTx = sym.AggregateTransaction.createBonded(
     sym.Deadline.create(epochAdjustment),
     aggregateArray,
@@ -39,61 +45,222 @@ aggregateTx = sym.AggregateTransaction.createBonded(
     [],
 ).setMaxFeeForAggregate(100, 1);
 
+//署名
 signedAggregateTx = alice.sign(aggregateTx, generationHash);
+```
 
+### ハッシュロックトランザクションの作成と署名、アナウンス
+```js
+//ハッシュロックTX作成
 hashLockTx = sym.HashLockTransaction.create(
   sym.Deadline.create(epochAdjustment),
 	networkCurrency.createRelative(10),//固定値
-	sym.UInt64.fromUint(480),
-	signedAggregateTx,
+	sym.UInt64.fromUint(480), // ロック有効期限
+	signedAggregateTx,// このハッシュ値を登録
 	networkType
 ).setMaxFee(100);
 
+//署名
 signedLockTx = alice.sign(hashLockTx, generationHash);
 
-//先にハッシュロックをアナウンス
+//ハッシュロックTXをアナウンス
 txRepo.announce(signedLockTx);
-//ハッシュロックトランザクションが承認された後、
+```
+
+### アグリゲートボンデッドトランザクションのアナウンス
+
+エクスプローラーなどで確認した後、ボンデッドトランザクションをネットワークにアナウンスします。
+```js
 txRepo.announceAggregateBonded(signedTx);
 ```
 
-## シークレットロック
+
+### 連署
+ロックされたトランザクションを指定されたアカウント(Bob)で連署します。
 
 ```js
-carol = sym.Account.generateNewAccount(networkType);
-console.log(carol.address);
+cosignatureTx = sym.CosignatureTransaction.create(aggregateTx);
+signedCosTx = bob.signCosignatureTransaction(cosignatureTx);
+await txRepo.announceAggregateBondedCosignature(signedCosTx).toPromise();
+```
 
+### 注意点
+ハッシュロックトランザクションは誰がアナウンスしても大丈夫ですが、
+ロックされたアグリゲートトランザクションのinnerTransactionのsignerに含めるようにしてください。
+モザイク送信無し＆メッセージ無しのダミートランザクションでも問題ありません
+
+
+## シークレットロック・シークレットプルーフ
+
+シークレットロックは事前に共通パスワードを作成しておき、指定モザイクをロックします。
+受信者が有効期限内にパスワードの所有を証明することができればロックされたモザイクを受け取ることができる仕組みです。
+
+ここではAliceが1XYMをロックしてBobが解除することで受信する方法を説明します。
+
+まずはAliceとやり取りするBobアカウントを作成します。
+ロック解除にBob側からトランザクションをアナウンスする必要があるのでFAUCETで10XYMほど受信しておきます。
+
+```js
+bob = sym.Account.generateNewAccount(networkType);
+console.log(bob.address);
+
+//FAUCET URL出力
+console.log("https://testnet.symbol.tools/?recipient=" + bob.address.plain() +"&amount=10");
+```
+
+### シークレットロック
+
+ロック・解除にかかわる共通暗号を作成します。
+
+```js
 random = sym.Crypto.randomBytes(20);
-proof = random.toString('hex'); //秘密の合言葉
 hash = sha3_256.create();
-secret = hash.update(random).hex();//ダイジェスト
+secret = hash.update(random).hex(); //ロック用キーワード
+proof = random.toString('hex'); //解除用キーワード
+console.log("secret:" + secret);
+console.log("proof:" + proof);
+```
 
+出力例
+```js
+> secret:f260bfb53478f163ee61ee3e5fb7cfcaf7f0b663bc9dd4c537b958d4ce00e240
+  proof:7944496ac0f572173c2549baf9ac18f893aab6d0
+```
 
+トランザクションを作成・署名・アナウンスします
+```js
 lockTx = sym.SecretLockTransaction.create(
     sym.Deadline.create(epochAdjustment),
-    networkCurrency.createRelative(1),
-    sym.UInt64.fromUint(5),
-    sym.LockHashAlgorithm.Op_Sha3_256,
-    secret,
-    carol.address,
+    new sym.Mosaic(
+      new sym.NamespaceId("symbol.xym"),
+      sym.UInt64.fromUint(1000000) //1XYM
+    ),　//ロックするモザイク
+    sym.UInt64.fromUint(480), //ロック期間(ブロック数)
+    sym.LockHashAlgorithm.Op_Sha3_256, //ロックキーワード生成に使用したアルゴリズム
+    secret,　//ロック用キーワード
+    bob.address, //解除時の転送先:Bob
     networkType
 ).setMaxFee(100);
 
 signedLockTx = alice.sign(lockTx,generationHash);
-txRepo.announce(signedLockTx).subscribe(x=>console.log(x));
+await txRepo.announce(signedLockTx).toPromise();
+```
 
-//ロックされていることを確認
+LockHashAlgorithmは以下の通りです。
+```js
+{0: 'Op_Sha3_256', 1: 'Op_Hash_160', 2: 'Op_Hash_256'}
+```
 
+ロック時に解除先を指定するのでBob以外のアカウントが解除することはできません。
+ロック期間は最長で365日(ブロック数を日換算)までです。
+
+承認されたトランザクションを確認します。
+```js
+slRepo = repo.createSecretLockRepository();
+res = await slRepo.search({secret:secret}).toPromise();
+console.log(res.data[0]);
+```
+
+出力例
+```js
+> SecretLockInfo
+    amount: UInt64 {lower: 1000000, higher: 0}
+    compositeHash: "770F65CB0CC0CA17370DE961B2AA5B48B8D86D6DB422171AB00DF34D19DEE2F1"
+    endHeight: UInt64 {lower: 323495, higher: 0}
+    hashAlgorithm: 0
+    mosaicId: MosaicId {id: Id}
+    ownerAddress: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
+    recipientAddress: Address {address: 'TBTWKXCNROT65CJHEBPL7F6DRHX7UKSUPD7EUGA', networkType: 152}
+    recordId: "6260A1D3205E94BEA3D9E3E9"
+    secret: "F260BFB53478F163EE61EE3E5FB7CFCAF7F0B663BC9DD4C537B958D4CE00E240"
+    status: 0
+    version: 1
+```
+ロックしたAliceがownerAddress、受信予定のBobがrecipientAddressに記録されています。
+secret情報が公開されていて、これに対応するproofをBobがネットワークに通知します。
+
+
+### シークレットプルーフ
+
+解除用キーワードを使用してロック解除します。
+Bobは事前に解除用キーワードを入手しておく必要があります。
+
+```js
 proofTx = sym.SecretProofTransaction.create(
     sym.Deadline.create(epochAdjustment),
-    sym.LockHashAlgorithm.Op_Sha3_256,
-    secret,
-    carol.address,
-    proof,
+    sym.LockHashAlgorithm.Op_Sha3_256, //ロック作成に使用したアルゴリズム
+    secret, //ロックキーワード
+    bob.address, //解除アカウント（受信アカウント）
+    proof, //解除用キーワード
     networkType
 ).setMaxFee(100);
 
-signedProofTx = carol.sign(proofTx,generationHash);
-txRepo.announce(signedProofTx).subscribe(x=>console.log(x));
-
+signedProofTx = bob.sign(proofTx,generationHash);
+await txRepo.announce(signedProofTx).toPromise();
 ```
+
+承認結果を確認します。
+```js
+txInfo = await txRepo.getTransaction(signedProofTx.hash,sym.TransactionGroup.Confirmed).toPromise();
+console.log(txInfo);
+```
+
+出力例
+```js
+> SecretProofTransaction
+  > deadline: Deadline {adjustedValue: 12669305546}
+    hashAlgorithm: 0
+    maxFee: UInt64 {lower: 20700, higher: 0}
+    networkType: 152
+    payloadSize: 207
+    proof: "A6431E74005585779AD5343E2AC5E9DC4FB1C69E"
+    recipientAddress: Address {address: 'TBTWKXCNROT65CJHEBPL7F6DRHX7UKSUPD7EUGA', networkType: 152}
+    secret: "4C116F32D986371D6BCC44CE64C970B6567686E79850E4A4112AF869580B7C3C"
+    signature: "951F440860E8F24F6F3AB8EC670A3D448B12D75AB954012D9DB70030E31DA00B965003D88B7B94381761234D5A66BE989B5A8009BB234716CA3E5847C33F7005"
+    signer: PublicAccount {publicKey: '9DC9AE081DF2E76554084DFBCCF2BC992042AA81E8893F26F8504FCED3692CFB', address: Address}
+  > transactionInfo: TransactionInfo
+        hash: "85044FF702A6966AB13D05DBE4AC4C3A13520C7381F32540429987C207B2056B"
+        height: UInt64 {lower: 323805, higher: 0}
+        id: "6260CC7F60EE2B0EA10CCEDA"
+        merkleComponentHash: "85044FF702A6966AB13D05DBE4AC4C3A13520C7381F32540429987C207B2056B"
+    type: 16978
+```
+
+SecretProofTransactionにはモザイクの受信量の情報は含まれていません。
+ブロック生成時に作成されるレシートで受信量を確認します。
+レシートタイプ:LockHash_Completed でBob宛のレシートを検索してみます。
+
+```js
+receiptInfo = await receiptRepo.searchReceipts({
+    receiptType:sym.ReceiptTypeLockHash_Completed,
+    targetAddress:bob.address
+}).toPromise();
+console.log(receiptInfo.data);
+```
+
+```js
+> data: Array(1)
+  >  0: TransactionStatement
+        height: UInt64 {lower: 323805, higher: 0}
+     >  receipts: Array(1)
+          > 0: BalanceChangeReceipt
+                amount: UInt64 {lower: 1000000, higher: 0}
+              > mosaicId: MosaicId
+                    id: Id {lower: 760461000, higher: 981735131}
+                targetAddress: Address {address: 'TBTWKXCNROT65CJHEBPL7F6DRHX7UKSUPD7EUGA', networkType: 152}
+                type: 8786
+                version: 1
+```
+
+ReceiptTypeは以下の通りです。
+
+```js
+{4685: 'Mosaic_Rental_Fee', 4942: 'Namespace_Rental_Fee', 8515: 'Harvest_Fee', 8776: 'LockHash_Completed', 8786: 'LockSecret_Completed', 9032: 'LockHash_Expired', 9042: 'LockSecret_Expired', 12616: 'LockHash_Created', 12626: 'LockSecret_Created', 16717: 'Mosaic_Expired', 16718: 'Namespace_Expired', 16974: 'Namespace_Deleted', 20803: 'Inflation', 57667: 'Transaction_Group', 61763: 'Address_Alias_Resolution', 62019: 'Mosaic_Alias_Resolution'}
+
+8786: 'LockSecret_Completed' :ロック解除完了
+9042: 'LockSecret_Expired'　：ロック期限切れ
+```
+
+## 現場で使えるヒント
+
+(現在執筆中)
