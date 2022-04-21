@@ -1,17 +1,14 @@
 # 6.ネームスペース
 
-ブロックチェーン技術はランダムに生成した秘密鍵を起点としてアドレスを生成するため、
-その所有者との関係性をアドレスを構成する文字文字列に表出させることは困難です。これは区別を容易にするための名前としてアドレスを実社会で活用するには不便であることを意味します。
 Symbolブロックチェーンではネームスペースをレンタルしてアドレスやモザイクに視認性の高い単語をリンクさせることができます。
 ネームスペースは最大64文字、利用可能な文字は a, b, c, …, z, 0, 1, 2, …, 9, _ , - です。
-
 
 ## 手数料の計算
 
 ネームスペースのレンタルにはネットワーク手数料とは別にレンタル手数料が発生します。
 ネットワークの活性度に比例して価格が変動しますので、取得前に確認するようにしてください。
 
-###### ルートネームスペースを365日レンタルする場合の手数料取得
+ルートネームスペースを365日レンタルする場合の手数料取得
 
 ```js
 rentalFees = await nwRepo.getRentalFees().toPromise();
@@ -21,7 +18,10 @@ rentalBlock = rentalDays * 24 * 60 * 60 / 30;
 rootNsRenatalFeeTotal = rentalBlock * rootNsperBlock;
 console.log("rentalBlock:" + rentalBlock);
 console.log("rootNsRenatalFeeTotal:" + rootNsRenatalFeeTotal);
+```
 
+出力例
+```js
 > rentalBlock:1051200
 > rootNsRenatalFeeTotal:210240000
 ```
@@ -29,12 +29,14 @@ console.log("rootNsRenatalFeeTotal:" + rootNsRenatalFeeTotal);
 期間はブロック数で指定します。1ブロックを30秒として計算しました。
 最低で30日分はレンタルする必要があります。
 
-###### サブネームスペースの取得手数料
+サブネームスペースの取得手数料を計算します。
 
 ```js
 childNamespaceRentalFee = rentalFees.effectiveChildNamespaceRentalFee.compact()
 console.log(childNamespaceRentalFee);
-
+```
+出力例
+```js
 > 10000000
 ```
 
@@ -42,7 +44,7 @@ console.log(childNamespaceRentalFee);
 
 ## レンタル
 
-###### ルートネームスペースのレンタル
+ルートネームスペースをレンタルします
 ```js
 
 tx = sym.NamespaceRegistrationTransaction.createRootNamespace(
@@ -53,10 +55,9 @@ tx = sym.NamespaceRegistrationTransaction.createRootNamespace(
 ).setMaxFee(100);
 signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
-
 ```
 
-###### サブネームスペースのレンタル
+サブネームスペースをレンタルします
 ```js
 subNamespaceTx = nem.NamespaceRegistrationTransaction.createSubNamespace(
 	sym.Deadline.create(epochAdjustment),
@@ -66,11 +67,7 @@ subNamespaceTx = nem.NamespaceRegistrationTransaction.createSubNamespace(
 ).setMaxFee(100);
 signedTx = alice.sign(subNamespaceTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
-
 ```
-
-
-
 
 ### 有効期限の計算
 
@@ -167,12 +164,12 @@ console.log(namespaceInfo);
 ```
 
 ###### AliasType
-```json
+```js
 {0: 'None', 1: 'Mosaic', 2: 'Address'}
 ```
 
 ###### NamespaceRegistrationType
-```json
+```js
 {0: 'RootNamespace', 1: 'SubNamespace'}
 ```
 
@@ -211,10 +208,11 @@ state = await receiptRepo.searchAddressResolutionStatements({height:179401}).toP
 ```
 
 ###### ResolutionType
-```json
+```js
 {0: 'Address', 1: 'Mosaic'}
 ```
 
 ## 現場で使えるヒント
 
 (現在執筆中)
+
