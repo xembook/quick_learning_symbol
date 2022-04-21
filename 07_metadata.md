@@ -1,104 +1,102 @@
 # 7.メタデータ
 
-アカウント・モザイク・ネームスペースに対して付加的なデータをKey-Value形式で登録することができます。
+アカウント・モザイク・ネームスペースに対してKey-Value形式のデータを登録することができます。  
 Valueの最大値は1024バイトです。
-
+本章ではモザイク・ネームスペースの作成アカウントとメタデータの作成アカウントがどちらもAliceであることを前提に説明します。
+異なるアカウントが作成したモザイクやネームスペースに対してメタデータを登録する場合は、この後の章で紹介するアグリゲートボンデッドトランザクション、オフライン署名を参考にしてください。
 
 ### アカウントに登録
 
-ターゲットとなるアカウントに対して、Key値・ソースアカウントの複合キーでValue値を登録します。
+アカウントに対して、Key値・ソースアカウントの複合キーでValue値を登録します。
 
 ```js
 metaRepo = repo.createMetadataRepository();
 metaService = new sym.MetadataTransactionService(metaRepo);
 
-accountKey = sym.KeyGenerator.generateUInt64Key("key_account");
+key = sym.KeyGenerator.generateUInt64Key("key_account");
 value = "test";
 
-metaTx = await metaService.createAccountMetadataTransaction(
+tx = await metaService.createAccountMetadataTransaction(
     undefined,
     networkType,
-    alice.address,//target
-    accountKey,
-    value,
-    alice.address // sender
+    alice.address, //メタデータ記録先アドレス
+    key,value, //Key-Value値
+    alice.address //メタデータ作成者アドレス
 ).toPromise();
 
 aggregateTx = sym.AggregateTransaction.createComplete(
   sym.Deadline.create(epochAdjustment),
-  [metaTx.toAggregate(alice.publicAccount)],
+  [tx.toAggregate(alice.publicAccount)],
   networkType,[]
 ).setMaxFeeForAggregate(100, 0);
 
 signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
-
 ```
 
-登録にはターゲットアカウントの署名が必要です。また、ターゲットとソースアカウントが同一でもアグリゲートトランザクションにする必要があります。
-
-
-
+メタデータの登録には記録先アカウントが承諾を示す署名が必要です。
+また、記録先アカウントと記録者アカウントが同一でもアグリゲートトランザクションにする必要があります。
 
 ### モザイクに登録
 
-
 ターゲットとなるモザイクに対して、Key値・ソースアカウントの複合キーでValue値を登録します。
-なお、登録にはターゲットアカウントの署名が必要です。ターゲットとソースアカウントが同一でも必要です。
-
-
+登録・更新にはモザイクを作成したアカウントの署名が必要です。
 
 ```js
 metaRepo = repo.createMetadataRepository();
 metaService = new sym.MetadataTransactionService(metaRepo);
 
+mosaicId = new sym.MosaicId("1275B0B7511D9161");
+mosaicInfo = await mosaicRepo.getMosaic(mosaicId).toPromise();
+
 key = sym.KeyGenerator.generateUInt64Key('key_mosaic');
 value = 'test';
 
-metaTx = await metaService.createMosaicMetadataTransaction(
+tx = await metaService.createMosaicMetadataTransaction(
   undefined,
   networkType,
-  alice.address,
-  new sym.MosaicId("1275B0B7511D9161"),
-  key,value,
+  mosaicInfo.ownerAddress, //モザイク作成者アドレス
+  mosaicId,
+  key,value, //Key-Value値
   alice.address
 ).toPromise();
 
-
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
-    [metaTx.toAggregate(alice.publicAccount)],
+    [tx.toAggregate(alice.publicAccount)],
     networkType,[]
 ).setMaxFeeForAggregate(100, 0);
 
 signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
-
 ```
-
-
 
 ### ネームスペースに登録
 
+ネームスペースに対して、Key-Value値を登録します。
+登録・更新にはネームスペースを作成したアカウントの署名が必要です。
 
 ```js
 metaRepo = repo.createMetadataRepository();
 metaService = new sym.MetadataTransactionService(metaRepo);
 
+namespaceId = new sym.NamespaceId("xembook");
+namespaceInfo = await nsRepo.getNamespace(namespaceId).toPromise();
+
 key = sym.KeyGenerator.generateUInt64Key('key_namespace');
 value = 'test';
 
-metaTx = await metaService.createNamespaceMetadataTransaction(
+tx = await metaService.createNamespaceMetadataTransaction(
     undefined,networkType,
-    alice.address,//ネームスペースの作成者
-    new sym.NamespaceId("xembook"),
-    key,value,
+    namespaceInfo.ownerAddress, //ネームスペースの作成者アドレス
+    namespaceId,
+    key,value, //Key-Value値
     alice.address //メタデータの登録者
 ).toPromise();
 
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
-    [metaTx.toAggregate(alice.publicAccount)],
+    [tx.toAggregate(alice.publicAccount)],
     networkType,[]
 ).setMaxFeeForAggregate(100, 0);
 
@@ -106,42 +104,58 @@ signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-## メタデータ参照
-登録したメタデータを参照します。
-
-### アカウントに登録したメタデータを検索
+登録内容を確認します
 ```js
-key = sym.KeyGenerator.generateUInt64Key("key_account");
-targetAddress = sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ")
-sourceAddress = sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ")
-result = await metaRepo.search({
-  scopedMetadataKey:key.toHex(),
-  targetAddress:targetAddress,
-  sourceAddress:sourceAddress,
-  metadataType:sym.MetadataType.Account}
+key = sym.KeyGenerator.generateUInt64Key("key_namespace");
+res = await metaRepo.search({
+  targetAddress:alice.address,
+  sourceAddress:alice.address}
 ).toPromise();
-console.log(result.data);
+console.log(res);
 ```
 
+出力例
 ```js
-> [Metadata]
-  > 0: Metadata
-      id: "62471DD29AFFBDFF8D494103"
-      > metadataEntry: MetadataEntry
-          compositeHash: "617B0F9208753A1080F93C1CEE1A35ED740603CE7CFC21FBAE3859B7707A9063"
-          metadataType: 0
-          scopedMetadataKey: UInt64 {lower: 92350423, higher: 2540877595}
-          sourceAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
-          targetAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
-          targetId: undefined
-          value: "test"
+data: Array(3)
+  0: Metadata
+    id: "62471DD2BF42F221DFD309D9"
+    metadataEntry: MetadataEntry
+      compositeHash: "617B0F9208753A1080F93C1CEE1A35ED740603CE7CFC21FBAE3859B7707A9063"
+      metadataType: 0
+      scopedMetadataKey: UInt64 {lower: 92350423, higher: 2540877595}
+      sourceAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+      targetAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+      targetId: undefined
+      value: "test"
+  1: Metadata
+    id: "62471F87BF42F221DFD30CC8"
+    metadataEntry: MetadataEntry
+      compositeHash: "D9E2019D7BD5BA58245320392A68B51752E35A35DA349B08E141DCE99AC3655A"
+      metadataType: 1
+      scopedMetadataKey: UInt64 {lower: 1789141730, higher: 3475078673}
+      sourceAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+      targetAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+      targetId: MosaicId
+      id: Id {lower: 1360892257, higher: 309702839}
+      value: "test"
+  3: Metadata
+    id: "62616372BF42F221DF00A88C"
+    metadataEntry: MetadataEntry
+      compositeHash: "D8E597C7B491BF7F9990367C1798B5C993E1D893222F6FC199F98915339D92D5"
+      metadataType: 2
+      scopedMetadataKey: UInt64 {lower: 141807833, higher: 2339015223}
+      sourceAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+      targetAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+      targetId: NamespaceId
+      id: Id {lower: 646738821, higher: 2754876907}
+      value: "test"
 ```
-
-###### MetadataType
+metadataTypeは以下の通りです。
 ```js
 sym.MetadataType
 {0: 'Account', 1: 'Mosaic', 2: 'Namespace'}
 ```
+
 
 ## 現場で使えるヒント
 
