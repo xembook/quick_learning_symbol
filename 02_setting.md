@@ -74,5 +74,5 @@ repo = new sym.RepositoryFactoryHttp(NODE);
 })();
 ```
 
-これで準備完了です。
+これで準備完了です。  
 4章以降は3章で作成したXYMを受信したAliceアカウントを準備していることが前提となりますのでご注意ください。
