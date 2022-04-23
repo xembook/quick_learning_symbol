@@ -5,9 +5,9 @@ Valueの最大値は1024バイトです。
 本章ではモザイク・ネームスペースの作成アカウントとメタデータの作成アカウントがどちらもAliceであることを前提に説明します。
 異なるアカウントが作成したモザイクやネームスペースに対してメタデータを登録する場合は、この後の章で紹介するアグリゲートボンデッドトランザクション、オフライン署名を参考にしてください。
 
-### アカウントに登録
+## 7.1 アカウントに登録
 
-アカウントに対して、Key値・ソースアカウントの複合キーでValue値を登録します。
+アカウントに対して、Key-Value値を登録します。
 
 ```js
 metaRepo = repo.createMetadataRepository();
@@ -37,13 +37,41 @@ await txRepo.announce(signedTx).toPromise();
 メタデータの登録には記録先アカウントが承諾を示す署名が必要です。
 また、記録先アカウントと記録者アカウントが同一でもアグリゲートトランザクションにする必要があります。
 
-### モザイクに登録
+異なるアカウントのメタデータに登録する場合は署名時に
+signTransactionWithCosignatoriesを使用します。
+
+```js
+    tx = await metaService.createAccountMetadataTransaction(
+        undefined,
+        networkType,
+        bob.address, //メタデータ記録先アドレス
+        key,value, //Key-Value値
+        alice.address //メタデータ作成者アドレス
+    ).toPromise();
+
+    aggregateTx = sym.AggregateTransaction.createComplete(
+      sym.Deadline.create(epochAdjustment),
+      [tx.toAggregate(alice.publicAccount)],
+      networkType,[]
+    ).setMaxFeeForAggregate(100, 1); // 第二引数に連署者の数:1
+
+    signedTx = aggregateTx.signTransactionWithCosignatories(
+      alice,[bob],generationHash,// 第二引数に連署者
+    );
+    await txRepo.announce(signedTx).toPromise();
+```
+
+bobの秘密鍵が分からない場合はこの後の章で説明する
+アグリゲートボンデッドトランザクション、あるいはオフライン署名を使用する必要があります。
+
+## 7.2 モザイクに登録
 
 ターゲットとなるモザイクに対して、Key値・ソースアカウントの複合キーでValue値を登録します。
 登録・更新にはモザイクを作成したアカウントの署名が必要です。
 
 ```js
 metaRepo = repo.createMetadataRepository();
+mosaicRepo = repo.createMosaicRepository();
 metaService = new sym.MetadataTransactionService(metaRepo);
 
 mosaicId = new sym.MosaicId("1275B0B7511D9161");
@@ -71,12 +99,13 @@ signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-### ネームスペースに登録
+## 7.3 ネームスペースに登録
 
 ネームスペースに対して、Key-Value値を登録します。
 登録・更新にはネームスペースを作成したアカウントの署名が必要です。
 
 ```js
+nsRepo = repo.createNamespaceRepository();
 metaRepo = repo.createMetadataRepository();
 metaService = new sym.MetadataTransactionService(metaRepo);
 
@@ -104,9 +133,12 @@ signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-登録内容を確認します
+## 7.4 確認
+登録したメタデータを確認します。
+
 ```js
-key = sym.KeyGenerator.generateUInt64Key("key_namespace");
+metaRepo = repo.createMetadataRepository();
+
 res = await metaRepo.search({
   targetAddress:alice.address,
   sourceAddress:alice.address}
