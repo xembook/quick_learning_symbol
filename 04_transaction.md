@@ -1,5 +1,4 @@
-ブロックチェーンのデータを更新するためには、アカウントの秘密鍵で署名したトランザクションをアナウンスする必要があります。
-
+ブロックチェーン上のデータ更新はトランザクションのアナウンスによって行います。
 
 ## トランザクションのライフサイクル
 
@@ -26,23 +25,33 @@
 まずは最も基本的な転送トランザクションを作成してみます。
 
 ### Bobへの転送トランザクション
+
+送信先のBobアドレスを作成しておきます。
 ```js
-bobAddress = sym.Address.createFromRawAddress("アドレス");
-tx1 = sym.TransferTransaction.create(
+bob = sym.Account.generateNewAccount(networkType);
+console.log(bob.address);
+```
+出力例
+```js
+> Address {address: 'TDWBA6L3CZ6VTZAZPAISL3RWM5VKMHM6J6IM3LY', networkType: 152}
+```
+
+トランザクションを作成します。
+```js
+tx = sym.TransferTransaction.create(
     sym.Deadline.create(epochAdjustment),
-    bobAddress, 
+    sym.Address.createFromRawAddress("TDWBA6L3CZ6VTZAZPAISL3RWM5VKMHM6J6IM3LY"), 
     [],
     sym.PlainMessage.create("Hello Symbol!"),
     networkType
 ).setMaxFee(100);
-
 ```
 
 #### 有効期限
 sdkではデフォルトで2時間後に設定されます。
-最大48時間まで指定可能です。
+最大6時間まで指定可能です。
 ```js
-sym.Deadline.create(epochAdjustment,48)
+sym.Deadline.create(epochAdjustment,6)
 ```
 
 #### メッセージ
@@ -78,9 +87,8 @@ sym.RawMessage.create(uint8Arrays[i])
 逆に、より少なく払いたいというトランザクションが多く存在し、その総額が大きい場合は、設定した最大額に満たない手数料額で送信が実現します。
 
 トランザクションサイズ x feeMultiprilerというもので決定されます。
-176バイトだった場合 maxFee を100で設定すると 176000μXYM = 0.176XYMを手数料として許容します。
-feeMultiprier = 100として指定する方法と
-maxFee = 176000 として指定する方法があります。
+176バイトだった場合 maxFee を100で設定すると 17600μXYM = 0.0176XYMを手数料として支払うことを許容します。
+feeMultiprier = 100として指定する方法とmaxFee = 176000 として指定する方法があります。
 
 ##### feeMultiprier = 100として指定する方法
 ```js
@@ -95,7 +103,7 @@ tx = sym.TransferTransaction.create(
 tx = sym.TransferTransaction.create(
   ,,,,
   networkType,
-  sym.UInt64.fromUint(176000)
+  sym.UInt64.fromUint(17600)
 );
 ```
 
@@ -109,7 +117,9 @@ tx = sym.TransferTransaction.create(
 ```js
 signedTx = alice.sign(tx,generationHash);
 console.log(signedTx);
-
+```
+出力例
+```js
 > SignedTransaction
     hash: "3BD00B0AF24DE70C7F1763B3FD64983C9668A370CB96258768B715B117D703C2"
     networkType: 152
@@ -121,15 +131,11 @@ console.log(signedTx);
 
 トランザクションの署名にはAccountクラスとgenerationHash値が必要です。
 
-##### generationHash(テストネット)
-```js
-'7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836'
-```
-
-##### generationHash(メインネット)
-```js
-'57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6'
-```
+generationHash
+- テストネット
+    - 7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836
+- メインネット
+    - 57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6
 
 generationHash値はそのブロックチェーンネットワークを一意に識別するための値です。
 同じ秘密鍵をもつ他のネットワークに使いまわされないようにそのネットワーク個別のハッシュ値を織り交ぜて署名済みトランザクションを作成します。
@@ -139,7 +145,9 @@ generationHash値はそのブロックチェーンネットワークを一意に
 ```js
 res = await txRepo.announce(signedTx).toPromise();
 console.log(res);
-
+```
+出力例
+```js
 > TransactionAnnounceResponse {message: 'packet 9 was pushed to the network via /transactions'}
 ```
 
@@ -161,9 +169,12 @@ Uncaught Error: {"statusCode":409,"statusMessage":"Unknown Error","body":"{\"cod
 ノードに受理されたトランザクションのステータスを確認
 
 ```js
+tsRepo = repo.createTransactionStatusRepository();
 transactionStatus = await tsRepo.getTransactionStatus(signedTx.hash).toPromise();
 console.log(transactionStatus);
-
+```
+出力例
+```js
 > TransactionStatus
     group: "confirmed"
     code: "Success"
@@ -174,8 +185,7 @@ console.log(transactionStatus);
 
 承認されると ` group: "confirmed"`となっています。
 
-受理されたものの、エラーが発生していた場合は以下のような出力となります。
-トランザクションを書き直して再度アナウンスしてみてください。
+受理されたものの、エラーが発生していた場合は以下のような出力となります。トランザクションを書き直して再度アナウンスしてみてください。
 
 ```js
 > TransactionStatus
@@ -186,12 +196,19 @@ console.log(transactionStatus);
     height: undefined
 ```
 
-### 承認確認
+以下のようにResourceNotFoundエラーが発生した場合はトランザクションが受理されていません。
+```js
+Uncaught Error: {"statusCode":404,"statusMessage":"Unknown Error","body":"{\"code\":\"ResourceNotFound\",\"message\":\"no resource exists with id '18AEBC9866CD1C15270F18738D577CB1BD4B2DF3EFB28F270B528E3FE583F42D'\"}"}
+```
 
+考えられる可能性としては、トランザクションで指定した最大手数料が、ノードで設定された最低手数料に満たない場合や、
+アグリゲートトランザクションとしてアナウンスすることが求められているトランザクションを単体のトランザクションでアナウンスした場合に発生するようです。
+
+### 承認確認
 
 トランザクションがブロックに承認されるまでに30秒程度かかります。
 
-### エクスプローラーで確認
+#### エクスプローラーで確認
 signedTx.hash で取得できるハッシュ値を使ってエクスプローラーで検索してみましょう。
 
 ```js
@@ -205,15 +222,53 @@ console.log(signedTx.hash);
 - テストネット　
   - https://testnet.symbol.fyi/transactions/661360E61C37E156B0BE18E52C9F3ED1022DCE846A4609D72DF9FA8A5B667747
 
+#### SDKで確認
 
-### 注意点
+```js
+txInfo = await txRepo.getTransaction(signedTx.hash,sym.TransactionGroup.Confirmed).toPromise();
+console.log(txInfo);
+```
+出力例
+```js
+> TransferTransaction
+    deadline: Deadline {adjustedValue: 12883929118}
+    maxFee: UInt64 {lower: 17400, higher: 0}
+    message: PlainMessage {type: 0, payload: 'Hello Symbol!'}
+    mosaics: []
+    networkType: 152
+    payloadSize: 174
+    recipientAddress: Address {address: 'TDWBA6L3CZ6VTZAZPAISL3RWM5VKMHM6J6IM3LY', networkType: 152}
+    signature: "7A3562DCD7FEE4EE9CB456E48EFEEC687647119DC053DE63581FD46CA9D16A829FA421B39179AABBF4DE0C1D987B58490E3F95C37327358E6E461832E3B3A60D"
+    signer: PublicAccount {publicKey: '0E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26', address: Address}
+  > transactionInfo: TransactionInfo
+        hash: "DA4B672E68E6561EAE560FB89B144AFE1EF75D2BE0D9B6755D90388F8BCC4709"
+        height: UInt64 {lower: 330012, higher: 0}
+        id: "626413050A21EB5CD286E17D"
+        index: 1
+        merkleComponentHash: "DA4B672E68E6561EAE560FB89B144AFE1EF75D2BE0D9B6755D90388F8BCC4709"
+    type: 16724
+    version: 1
+```
+##### 注意点
 
 トランザクションはブロックで承認されたとしても、ロールバックが発生するとトランザクションの承認が取り消される場合があります。
 ブロックが承認された後、数ブロックの承認が進むと、ロールバックの発生する確率は減少していきます。
 また、Votingノードの投票で実施されるファイナライズブロックを待つことで、記録されたデータは確実なものとなります。
 
+##### スクリプト例
+トランザクションをアナウンスした後は以下のようなスクリプトを流すと、チェーンの状態を把握しやすくて便利です。
+```js
+hash = signedTx.hash;
+tsRepo = repo.createTransactionStatusRepository();
+transactionStatus = await tsRepo.getTransactionStatus(hash).toPromise();
+console.log(transactionStatus);
+txInfo = await txRepo.getTransaction(hash,sym.TransactionGroup.Confirmed).toPromise();
+console.log(txInfo);
+```
+
 ## トランザクション履歴
 
+Aliceが送受信したトランザクション履歴を一覧で取得します。
 ```js
 result = await txRepo.search(
   {
@@ -227,7 +282,10 @@ txes = result.data;
 txes.forEach(tx => {
   console.log(tx);
 })
+```
 
+出力例
+```js
 > TransferTransaction
     type: 16724
     networkType: 152
@@ -253,55 +311,64 @@ txes.forEach(tx => {
       merkleComponentHash: "308472D34BE1A58B15A83B9684278010F2D69B59E39127518BE38A4D22EEF31D"
 ```
 
-###### TransactionType
+TransactionTypeは以下の通りです。
 ```json
 {0: 'RESERVED', 16705: 'AGGREGATE_COMPLETE', 16707: 'VOTING_KEY_LINK', 16708: 'ACCOUNT_METADATA', 16712: 'HASH_LOCK', 16716: 'ACCOUNT_KEY_LINK', 16717: 'MOSAIC_DEFINITION', 16718: 'NAMESPACE_REGISTRATION', 16720: 'ACCOUNT_ADDRESS_RESTRICTION', 16721: 'MOSAIC_GLOBAL_RESTRICTION', 16722: 'SECRET_LOCK', 16724: 'TRANSFER', 16725: 'MULTISIG_ACCOUNT_MODIFICATION', 16961: 'AGGREGATE_BONDED', 16963: 'VRF_KEY_LINK', 16964: 'MOSAIC_METADATA', 16972: 'NODE_KEY_LINK', 16973: 'MOSAIC_SUPPLY_CHANGE', 16974: 'ADDRESS_ALIAS', 16976: 'ACCOUNT_MOSAIC_RESTRICTION', 16977: 'MOSAIC_ADDRESS_RESTRICTION', 16978: 'SECRET_PROOF', 17220: 'NAMESPACE_METADATA', 17229: 'MOSAIC_SUPPLY_REVOCATION', 17230: 'MOSAIC_ALIAS', 17232: 'ACCOUNT_OPERATION_RESTRICTION'
 ```
 
-###### MessageType
+MessageTypeは以下の通りです。
 ```json
 {0: 'PlainMessage', 1: 'EncryptedMessage', 254: 'PersistentHarvestingDelegationMessage', -1: 'RawMessage'}
 ```
 ## アグリゲートトランザクション
 
-Symbolでは複数のトランザクションをリストにしてまとめて1ブロックで承認
+Symbolでは複数のトランザクションを1ブロックにまとめてアナウンスすることができます。
 以降の章で扱う内容にアグリゲートトランザクションへの理解が必要な機能が含まれますので、
 本章ではアグリゲートトランザクションのうち、簡単なものだけを紹介します。
 ### 起案者の署名だけが必要な場合
 
 ```js
-bobAddress = sym.Address.createFromRawAddress("受信アドレス");
+bob = sym.Account.generateNewAccount(networkType);
+carol = sym.Account.generateNewAccount(networkType);
 
 innerTx1 = sym.TransferTransaction.create(
-    undefined,
-    bobAddress, 
+    undefined, //Deadline
+    bob.address,  //送信先
     [],
     sym.PlainMessage.create("tx1"),
-    0
+    networkType
 );
 
 innerTx2 = sym.TransferTransaction.create(
-    undefined,
-    bobAddress, 
+    undefined, //Deadline
+    carol.address,  //送信先
     [],
     sym.PlainMessage.create("tx2"),
-    0
+    networkType
 );
 
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
     [
-      innerTx1.toAggregate(alice.publicAccount),
-      innerTx2.toAggregate(alice.publicAccount)
+      innerTx1.toAggregate(alice.publicAccount), //送信元アカウントの公開鍵
+      innerTx2.toAggregate(alice.publicAccount)  //送信元アカウントの公開鍵
     ],
     networkType,
     [],
     sym.UInt64.fromUint(1000000)
 );
 signedTx = alice.sign(aggregateTx,generationHash);
-txRepo.announce(signedTx).subscribe(x=>console.log(x));
-
+await txRepo.announce(signedTx).toPromise();
 ```
+
+まず、アグリゲートトランザクションに含めるトランザクションを作成します。
+このときDeadlineを指定する必要はありません。
+リスト化するときに、生成したトランザクションにtoAggregateを追加して送信元アカウントの公開鍵を指定します。
+送信元アカウントと署名アカウントが必ずしも一致するとは限りません。これがSymbolブロックチェーンの最も重要な考え方になります。
+本章で扱うトランザクションは同じAliceですので、アグリゲートボンデッドトランザクションへの署名もAliceを指定します。
+
+
+
 
 ## 現場で使えるヒント
 
