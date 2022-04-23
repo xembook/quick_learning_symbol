@@ -1,4 +1,3 @@
-# 3.アカウント
 アカウントは秘密鍵に紐づく情報が記録されたデータ構造体です。  
 アカウントと関連づいた秘密鍵を使って署名することでのみブロックチェーンのデータを更新することができます。  
 
@@ -11,7 +10,9 @@
 ```js
 alice = sym.Account.generateNewAccount(networkType);
 console.log(alice);
-
+```
+出力例
+```js
 > Account
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
     keyPair: {privateKey: Uint8Array(32), publicKey: Uint8Array(32)}
@@ -64,7 +65,9 @@ alicePublicAccount = sym.PublicAccount.createFromPublicKey(
   networkType
 );
 console.log(alicePublicAccount);
-
+```
+出力例
+```js
 > PublicAccount
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
     publicKey: "D4933FC1E4C56F9DF9314E9E0533173E1AB727BDB2A04B59F048124E93BEFBD2"
@@ -77,7 +80,9 @@ aliceAddress = sym.Address.createFromRawAddress(
   "TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ"
 );
 console.log(aliceAddress);
-
+```
+出力例
+```js
 > Address
     address: "TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ"
     networkType: 152
@@ -126,7 +131,9 @@ Symbolブロックチェーンでは、この手数料をXYMという共通ト�
 accountRepo = repo.createAccountRepository();
 accountInfo = await accountRepo.getAccountInfo(aliceAddress).toPromise();
 console.log(accountInfo);
-
+```
+出力例
+```js
 > AccountInfo
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
     publicKey: "0000000000000000000000000000000000000000000000000000000000000000"
@@ -153,6 +160,10 @@ accountInfo.mosaics.forEach(async mosaic => {
   mosaicInfo = await mosaicRepo.getMosaic(mosaic.id).toPromise();
 });
 ```
+
+大きすぎるid値をcompactで数値変換するとエラーが発生することがあります。
+`Compacted value is greater than Number.Max_Value.`
+
 
 #### 表示桁数の調整
 
@@ -236,6 +247,7 @@ console.log(isVerified);
 > true
 ```
 
+ブロックチェーンを使用しない署名は何度も再利用される可能性があることにご注意ください。
 
 ### アカウントの保管
 
