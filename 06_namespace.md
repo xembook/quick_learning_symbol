@@ -21,8 +21,7 @@ rootNsRenatalFeeTotal = rentalBlock * rootNsperBlock;
 console.log("rentalBlock:" + rentalBlock);
 console.log("rootNsRenatalFeeTotal:" + rootNsRenatalFeeTotal);
 ```
-
-出力例
+###### 出力例
 ```js
 > rentalBlock:1051200
 > rootNsRenatalFeeTotal:210240000 //約210XYM
@@ -37,7 +36,7 @@ console.log("rootNsRenatalFeeTotal:" + rootNsRenatalFeeTotal);
 childNamespaceRentalFee = rentalFees.effectiveChildNamespaceRentalFee.compact()
 console.log(childNamespaceRentalFee);
 ```
-出力例
+###### 出力例
 ```js
 > 10000000 //10XYM
 ```
@@ -106,8 +105,7 @@ console.log(endDate);
 ネームスペース情報の終了ブロックを取得し、現在のブロック高から差し引いた残ブロック数に
 30秒(平均ブロック生成間隔)を掛け合わせた日時を出力します。
 
-
-出力例
+###### 出力例
 ```js
 > Tue Mar 29 2022 18:17:06 GMT+0900 (日本標準時)
 ```
@@ -202,8 +200,7 @@ nsRepo = repo.createNamespaceRepository();
 namespaceInfo = await nsRepo.getNamespace(new sym.NamespaceId("xembook")).toPromise();
 console.log(namespaceInfo);
 ```
-
-出力例
+###### 出力例
 ```js
 > NamespaceInfo
 	> alias: AddressAlias
@@ -230,8 +227,7 @@ nsRepo = repo.createNamespaceRepository();
 namespaceInfo = await nsRepo.getNamespace(new sym.NamespaceId("xembook.tomato")).toPromise();
 console.log(namespaceInfo);
 ```
-
-出力例
+###### 出力例
 ```js
 > NamespaceInfo 
 	> alias: MosaicAlias
@@ -266,8 +262,7 @@ console.log(namespaceIds);
 ```js
 state = await receiptRepo.searchAddressResolutionStatements({height:179401}).toPromise();
 ```
-
-出力例
+###### 出力例
 ```js
 data: Array(1)
   0: ResolutionStatement
