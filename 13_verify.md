@@ -308,7 +308,7 @@ function checkState(stateProof,stateHash,pathHash,rootHash){
 ```
 
 
-### アカウント情報の検証
+### 13.3.1 アカウント情報の検証
 
 
 ```js
@@ -333,7 +333,7 @@ checkState(stateProof,aliceStateHash,alicePathHash,rootHash);
 ```
 
 
-### モザイクへ登録したメタデータの検証
+### 13.3.2 モザイクへ登録したメタデータの検証
 ```js
 
 srcAddress = sym.Convert.hexToUint8(
@@ -380,7 +380,7 @@ stateProof = await stateProofService.metadataById(compositeHash).toPromise();
 checkState(stateProof,stateHash,pathHash,rootHash);
 ```
 
-### アカウントへ登録したメタデータの検証
+### 13.3.3 アカウントへ登録したメタデータの検証
 
 
 ```js
@@ -427,16 +427,4 @@ stateProof = await stateProofService.metadataById(compositeHash).toPromise();
 checkState(stateProof,stateHash,pathHash,rootHash);
 ```
 
-## 現場で使えるヒント
-
-ノードへのデータ更新は、最終的にはブロックチェーン全体で検証されますが、  
-ノードからのデータ抽出は、ブロックチェーン全体からではなく一つのノードからのデータを取得したに過ぎないため、  
-自身が管理したノードから取得して完全に信頼できるアプリケーションで表示したものでない限り、厳密には検証する必要があります。  
-例えば価値のあるカウントから重要なメタデータを記録したモザイクの送信トランザクションを検証する場合、  
-トランザクションの署名検証だけでは不十分で、  
-
-- そのトランザクションがブロックチェーンに含まれているかを検証。
-- 転送指定されたモザイクに記録されたメタデータがブロックに含まれるかを検証。
-- ファイナライズブロックからそのブロックへたどることができるか検証。
-
-すべての検証に成功すれば、メタデータに重要な証明が記されたモザイクの送信が間違いなくブロックチェーンに記録されていることが確認できます。  
+## 13.4 現場で使えるヒント
