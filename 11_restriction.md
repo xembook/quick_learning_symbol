@@ -1,4 +1,5 @@
 # 11.制限
+
 アカウントに対する制限、モザイクのグローバル制限についての方法を紹介します。
 
 ## 11.1 アカウント制限
@@ -10,8 +11,8 @@ bob = sym.Account.generateNewAccount(networkType);
 tx = sym.AccountRestrictionTransaction.createAddressRestrictionModificationTransaction(
   sym.Deadline.create(epochAdjustment),
   sym.AddressRestrictionFlag.BlockOutgoingAddress,
-  [bob.address],
-  [],
+  [bob.address],//設定アドレス
+  [],　　　　　　//解除アドレス
   networkType
 ).setMaxFee(100);
 signedTx = alice.sign(tx,generationHash);
@@ -35,8 +36,8 @@ mosaicId = new sym.MosaicId("1275B0B7511D9161");
 tx = sym.AccountRestrictionTransaction.createMosaicRestrictionModificationTransaction(
   sym.Deadline.create(epochAdjustment),
   sym.MosaicRestrictionFlag.BlockMosaic,
-  [mosaicId],
-  [],
+  [mosaicId],//設定モザイク
+  [],//解除モザイク
   networkType
 ).setMaxFee(100);
 signedTx = alice.sign(tx,generationHash);
@@ -49,7 +50,7 @@ await txRepo.announce(signedTx).toPromise();
 ```
 
 - AllowMosaic：指定モザイクを含むトランザクションのみ受信許可
-- BlockMosaic：指定モザイクを含むトランザクションを受信拒否となります。
+- BlockMosaic：指定モザイクを含むトランザクションを受信拒否
 
 モザイク送信の制限機能はありません。
 
@@ -59,8 +60,8 @@ await txRepo.announce(signedTx).toPromise();
 tx = sym.AccountRestrictionTransaction.createOperationRestrictionModificationTransaction(
   sym.Deadline.create(epochAdjustment),
   sym.OperationRestrictionFlag.AllowOutgoingTransactionType,
-  [sym.TransactionType.TRANSFER],
-  [],
+  [sym.TransactionType.TRANSFER],//設定トランザクション
+  [],//解除トランザクション
   networkType
 ).setMaxFee(100);
 signedTx = alice.sign(tx,generationHash);
@@ -110,7 +111,7 @@ console.log(res);
 
 グローバルモザイク制限はモザイクに対して送信可能な条件を設定します。  
 その後、各アカウントに対してグローバルモザイク制限専用の数値メタデータを付与します。  
-送信アカウント、受信アカウント相互に条件を満たした場合のみ、該当モザイクを送信することができます。  
+送信アカウント・受信アカウントの両方が条件を満たした場合のみ、該当モザイクを送信することができます。  
 
 
 ### グローバル制限機能つきモザイクの作成
@@ -184,9 +185,9 @@ await txRepo.announce(signedTx).toPromise();
 ### アカウントへのモザイク制限適用
 
 Alice,Bobに対してグローバル制限モザイクに対しての適格情報を追加します。  
-送信・受信についてかかる制限なので、すでに所有しているモザイク量についての制限はありません。  
+送信・受信についてかかる制限なので、すでに所有しているモザイクについての制限はありません。  
 送信を成功させるためには、送信者・受信者双方が条件をクリアしている必要があります。  
-モザイク作成者の秘密鍵があればどのアカウントに対しても許可なく制限をつけることができます。  
+モザイク作成者の秘密鍵があればどのアカウントに対しても承諾の署名を必要とせずに制限をつけることができます。  
 
 ```js
 //Aliceに適用
@@ -219,12 +220,15 @@ await txRepo.announce(signedTx).toPromise();
 
 ### 制限状態確認
 
-ノードに問い合わせて限状態を確認します。
+ノードに問い合わせて制限状態を確認します。
 
 ```js
 res = await resMosaicRepo.search({mosaicId:mosaicDefTx.mosaicId}).toPromise();
 console.log(res);
+```
 
+出力例
+```js
 > data
 	> 0: MosaicGlobalRestriction
       compositeHash: "68FBADBAFBD098C157D42A61A7D82E8AF730D3B8C3937B1088456432CDDB8373"
@@ -285,13 +289,13 @@ await txRepo.announce(signedTx).toPromise();
 {"hash":"E3402FB7AE21A6A64838DDD0722420EC67E61206C148A73B0DFD7F8C098062FA","code":"Failure_RestrictionMosaic_Account_Unauthorized","deadline":"12371602742","group":"failed"}
 ```
 
-## 11.3 今日から現場で使えるTIPS
+## 11.3 現場で使えるヒント
 
 ### アカウントバーン
 
 AllowIncomingAddressによって指定アドレスからのみ受信可能にしておいて、  
-手数料に使用するトークンを全量送信すると、秘密鍵を持っていても操作困難なアカウントを明示的に作成することができます。  
-（最小手数料を0に設定したノードによって承認される可能性はあります。）  
+XYMを全量送信すると、秘密鍵を持っていても操作困難なアカウントを明示的に作成することができます。  
+（最小手数料を0に設定したノードによって承認される可能性はあるので、保険的な意味での）  
 
 ### モザイクロック
 譲渡不可設定のモザイクを配布し、配布者側のアカウントで受け取り拒否を行うと動かすことのできないモザイクを作ることができます。
@@ -299,5 +303,3 @@ AllowIncomingAddressによって指定アドレスからのみ受信可能にし
 ### 独自経済圏
 KYC済みのアカウント間でのみ流通可能なモザイクを作成することができます。
 
-### オプトイン署名不要なメタデータ
-MosaicAddressRestrictionを利用して任意のアカウントに対し、許可なしで数値のメタデータを付与することができます。
