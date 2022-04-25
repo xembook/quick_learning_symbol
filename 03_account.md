@@ -13,7 +13,7 @@
 alice = sym.Account.generateNewAccount(networkType);
 console.log(alice);
 ```
-出力例
+###### 出力例
 ```js
 > Account
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
@@ -45,7 +45,8 @@ console.log(alice.publicKey);
 ```js
 aliceRawAddress = alice.address.plain();
 console.log(aliceRawAddress);
-
+```
+```js
 > TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ
 ```
 
@@ -68,7 +69,7 @@ alicePublicAccount = sym.PublicAccount.createFromPublicKey(
 );
 console.log(alicePublicAccount);
 ```
-出力例
+###### 出力例
 ```js
 > PublicAccount
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
@@ -83,7 +84,7 @@ aliceAddress = sym.Address.createFromRawAddress(
 );
 console.log(aliceAddress);
 ```
-出力例
+###### 出力例
 ```js
 > Address
     address: "TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ"
@@ -134,7 +135,7 @@ accountRepo = repo.createAccountRepository();
 accountInfo = await accountRepo.getAccountInfo(aliceAddress).toPromise();
 console.log(accountInfo);
 ```
-出力例
+###### 出力例
 ```js
 > AccountInfo
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
@@ -207,7 +208,8 @@ Aliceの公開鍵・Bobの公開鍵で暗号化し、Aliceの公開鍵・Bobの�
 message = 'Hello Symol!';
 encryptedMessage = alice.encryptMessage(message ,bob.publicAccount);
 console.log(encryptedMessage);
-
+```
+```js
 > 294C8979156C0D941270BAC191F7C689E93371EDBC36ADD8B920CF494012A97BA2D1A3759F9A6D55D5957E9D
 ```
 
@@ -220,8 +222,9 @@ decryptMessage = bob.decryptMessage(
   alice.publicAccount
 ).payload
 console.log(decryptMessage);
-
->"Hello Symol!"
+```
+```js
+> "Hello Symol!"
 ```
 
 #### 署名
@@ -233,7 +236,8 @@ Buffer = require("/node_modules/buffer").Buffer;
 payload = Buffer.from("Hello Symol!", 'utf-8');
 signature = Buffer.from(sym.KeyPair.sign(alice.keyPair, payload)).toString("hex").toUpperCase();
 console.log(signature);
-
+```
+```
 > B8A9BCDE9246BB5780A8DED0F4D5DFC80020BBB7360B863EC1F9C62CAFA8686049F39A9F403CB4E66104754A6AEDEF8F6B4AC79E9416DEEDC176FDD24AFEC60E
 ```
 
@@ -245,7 +249,8 @@ isVerified = sym.KeyPair.verify(
   Buffer.from(signature, 'hex')
 )
 console.log(isVerified);
-
+```
+```js
 > true
 ```
 
@@ -277,7 +282,9 @@ signerQR.toBase64().subscribe(x =>{
 
 //アカウントを暗号化したJSONデータとして表示
 console.log(signerQR.toJSON());
-
+```
+###### 出力例
+```js
 > {"v":3,"type":2,"network_id":152,"chain_id":"7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836",
     "data":{
       "ciphertext":
@@ -293,7 +300,8 @@ console.log(signerQR.toJSON());
 qr = require("/node_modules/symbol-qr-library");
 signerQR = qr.AccountQR.fromJSON({暗号化された秘密鍵のJSONデータ},{パスフレーズ});
 console.log(signerQR.accountPrivateKey);
-
+```
+```js
 > 1E9139CC1580B4AED6A1FE110085281D4982ED0D89CE07F3380EB83069B1****
 ```
 
