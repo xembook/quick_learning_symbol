@@ -26,7 +26,9 @@ tx = sym.TransactionMapping.createFromPayload(payload);
 hash = sym.Transaction.createTransactionHash(payload,Buffer.from(generationHash, 'hex'));
 console.log(hash);
 console.log(tx);
-
+```
+###### 出力例
+```js
 > 257E2CAECF4B477235CA93C37090E8BE58B7D3812A012E39B7B55BA7D7FFCB20
 > AggregateTransaction
     > cosignatures: Array(1)
@@ -61,7 +63,8 @@ res = alice.publicAccount.verifySignature(
     "93B0B985101C1BDD1BC2BF30D72F35E34265B3F381ECA464733E147A4F0A6B9353547E2E08189EF37E50D271BEB5F09B81CE5816BB34A153D2268520AF630A0A"
 );
 console.log(res);
-
+```
+```js
 > true
 ```
 
@@ -86,9 +89,9 @@ if( tx.cosignatures !== undefined && tx.cosignatures.length > 0){
   merkleComponentHash = hasher.hex().toUpperCase();
 }
 console.log(merkleComponentHash);
-
+```
+```js
 > C8D1335F07DE05832B702CACB85B8EDAC2F3086543C76C9F56F99A0861E8F235
-
 ```
 
 ### InBlockの検証
@@ -125,7 +128,8 @@ merkleProof = (await blockRepo.getMerkleTransaction(height, leaf).toPromise()).m
 
 result = validateTransactionInBlock(leaf,HRoot,merkleProof);
 console.log(result);
-
+```
+```js
 > true
 ```
 
@@ -219,7 +223,8 @@ if(block.type ===  sym.BlockType.ImportanceBlock){
 ### stateHashの検証
 ```js
 console.log(block);
-
+```
+```js
 > NormalBlockInfo
     height: UInt64 {lower: 59639, higher: 0}
     hash: "B5F765D388B5381AC93659F501D5C68C00A2EE7DF4548C988E97F809B279839B"
@@ -234,7 +239,8 @@ console.log(block);
         6: "132324AF5536EC9AA85B2C1697F6B357F05EAFC130894B210946567E4D4E9519"
         7: "8374F46FBC759049F73667265394BD47642577F16E0076CBB7B0B9A92AAE0F8E"
         8: "45F6AC48E072992343254F440450EF4E840D8386102AD161B817E9791ABC6F7F"
-
+```
+```js
 hasher = sha3_256.create();
 hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[0],'hex')); //AccountState
 hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[1],'hex')); //Namespace
@@ -247,7 +253,8 @@ hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[7],'hex')); //Mosai
 hasher.update(Buffer.from(block.stateHashSubCacheMerkleRoots[8],'hex')); //Metadata
 hash = hasher.hex().toUpperCase();
 console.log(block.stateHash === hash);
-
+```
+```js
 > true
 ```
 
