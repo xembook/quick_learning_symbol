@@ -4,14 +4,14 @@
 複数の署名（オンライン署名）を集めるアグリゲートトランザクションを紹介しました。    
 この章では、トランザクションを事前に署名を集めてノードにアナウンスするオフライン署名について説明します。  
 
-### 手順
+## 手順
 
 Aliceが起案者となりトランザクションを作成し、署名します。  
 次にBobが署名してAliceに返します。  
 最後にAliceがトランザクションを結合してネットワークにアナウンスします。  
 
 
-### 12.1 トランザクション作成
+## 12.1 トランザクション作成
 ```js
 bob = sym.Account.generateNewAccount(networkType);
 
@@ -53,14 +53,18 @@ console.log(signedPayload);
 署名を行い、signedHash,signedPayloadを出力します。  
 signedPayloadをBobに渡して署名を促します。  
 
-### 12.2 Bobによる連署
+## 12.2 Bobによる連署
 
-BobはAliceからsignedPayloadを受け取ります。
+
+Aliceから受け取ったsignedPayloadでトランザクションを復元します。
 
 ```js
 tx = sym.TransactionMapping.createFromPayload(signedPayload);
 console.log(tx);
+```
 
+出力例
+```js
 > AggregateTransaction
     cosignatures: []
     deadline: Deadline {adjustedValue: 12197090355}
@@ -87,7 +91,9 @@ res = tx.signer.verifySignature(
     tx.signature
 );
 console.log(res);
-
+```
+出力
+```js
 > true
 ```
 
@@ -102,7 +108,7 @@ bobSignedTxSignerPublicKey = bobSignedTx.signerPublicKey;
 CosignatureTransactionで署名を行い、bobSignedTxSignature,bobSignedTxSignerPublicKeyを出力しAliceに返却します。  
 Bobが全ての署名を揃えられる場合は、Aliceに返却しなくてもBobがアナウンスすることも可能です。
 
-### 12.3 Aliceによるアナウンス
+## 12.3 Aliceによるアナウンス
 
 AliceはBobからbobSignedTxSignature,bobSignedTxSignerPublicKeyを受け取ります。  
 また事前にAlice自身で作成したsignedPayloadを用意します。  
@@ -131,7 +137,11 @@ await txRepo.announce(signedTx,listener).toPromise();
 
 ## 12.4 現場で使えるヒント
 
+### マーケットプレイスレス
 ボンデッドトランザクションと異なりハッシュロックの費用を気にする必要がありません。  
-ペイロードを共有できる場が存在する場合は十分に利用価値があります。  
-ただ、オフラインで署名を交換するため、なりすましのペイロード署名要求には気を付けた方がいいでしょう。  
+ペイロードを共有できる場が存在する場合、売り手は考えられるすべての買い手候補に対してペイロードを作成して交渉開始を待つことができます。
+この交渉に専用のマーケットプレイスを構築する必要はありません。
+SNSのタイムラインをマーケットプレイスにしたり、交通制御など必要に応じて任意の時間や空間でワンタイムマーケットプレイスを展開することができます。
+
+ただ、オフラインで署名を交換するため、なりすましのペイロード署名要求には気を付けた方がいいでしょう。
 （必ずペイロードからハッシュを生成して署名するようにしてください）
