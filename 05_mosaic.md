@@ -30,7 +30,7 @@ mosaicDefTx = sym.MosaicDefinitionTransaction.create(
 
 MosaicFlagsは以下の通りです。
 
-```json
+```js
 MosaicFlags {
   upplyMutable: false, transferable: false, restrictable: false, revokable: false
 }
