@@ -17,7 +17,7 @@ listener.open();
 
 何も通信が無ければ、listenerは1分で切断されます。
 
-## 10.1 受信検知
+## 10.2 受信検知
 
 アカウントが受信したトランザクションを検知します。
 
@@ -38,7 +38,10 @@ listener.open().then(() => {
         console.log(tx);
     });
 });
+```
 
+出力例
+```js
 > Promise {<pending>}
 > TransferTransaction {type: 16724, networkType: 152, version: 1, deadline: Deadline, maxFee: UInt64, …}
     deadline: Deadline {adjustedValue: 12449258375}
@@ -62,7 +65,7 @@ listener.open().then(() => {
 
 未承認トランザクションは transactionInfo.height=0　で受信します。
 
-## 10.2 ブロック監視
+## 10.3 ブロック監視
 
 新規に生成されたブロックを検知します。
 
@@ -73,7 +76,10 @@ listener.open().then(() => {
     listener.newBlock()
     .subscribe(block=>console.log(block));
 });
+```
 
+出力例
+```js
 > Promise {<pending>}
 > NewBlock
     beneficiaryAddress: Address {address: 'TAKATV2VSYBH3RX4JVCCILITWANT6JRANZI2AUQ', networkType: 152}
@@ -100,7 +106,7 @@ listener.open().then(() => {
 listener.newBlock()をしておくと、約30秒ごとに通信が発生するのでWebSocketの発生が起こりにくくなります。  
 まれに、ブロック生成が1分を超える場合があるのでその場合はリスナーを再接続する必要があります。  
 
-## 10.3 署名要求
+## 10.4 署名要求
 
 署名が必要なトランザクションが発生すると検知します。
 
@@ -110,6 +116,9 @@ listener.open().then(() => {
     listener.aggregateBondedAdded(bob.address)
     .subscribe(async tx=>console.log(tx));
 });
+```
+出力例
+```js
 
 > AggregateTransaction
     cosignatures: []
@@ -136,7 +145,7 @@ listener.open().then(() => {
 連署が必要かどうかは別途フィルターして判断します。
 
 
-## 10.4 現場で使えるヒント
+## 10.5 現場で使えるヒント
 ### 常時コネクション
 
 一覧からランダムに選択し、接続を試みます。
@@ -207,7 +216,7 @@ function createRepo(nodes){
 }
 ```
 まれに /network/properties のエンドポイントが解放されていないノードが存在するため、
-getEpochAdjustment() の情報を取得いてチェックを行います。取得できない場合は再帰的にcreateRepoを読み込みます。
+getEpochAdjustment() の情報を取得してチェックを行います。取得できない場合は再帰的にcreateRepoを読み込みます。
 
 
 ##### リスナーの常時接続
@@ -311,3 +320,7 @@ bondedSubscribe = function(observer){
 bondedSubscribe(bondedListener);
 bondedSubscribe(bondedHttp);
 ```
+
+##### 注意事項
+スキャムトランザクションを自動署名しないように、
+送信元のアカウントを確認するなどのチェック処理を必ず実施するようにしてください。
