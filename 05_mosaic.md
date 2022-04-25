@@ -38,7 +38,7 @@ MosaicFlags {
 数量変更、第三者への譲渡、モザイクグローバル制限の適用、発行者からの還収の可否について指定します。
 この項目は後で変更することはできません。
 
-##### divisibility:可分性
+#### divisibility:可分性
 
 可分性は小数点第何位まで数量の単位とするかを決めます。データは整数値として保持されます。
 
@@ -46,9 +46,7 @@ divisibility:0 = 1
 divisibility:1 = 1.0  
 divisibility:2 = 1.00  
 
-restrictableについては 11.制限 をご参考ください。
-
-##### duration:有効期限
+#### duration:有効期限
 
 0を指定した場合、無期限に使用することができます。
 モザイク有効期限を設定した場合、期限が切れた後も消滅することはなくデータとしては残ります。
@@ -143,8 +141,7 @@ XYMを送信するには以下のモザイクIDを指定します。
 小数点もすべて整数にして指定します。
 XYMは可分性6なので、1XYM=1000000で指定します。
 
-送信確認
-
+### 送信確認
 
 ```js
 txStatus = await tsRepo.getTransactionStatus(signedTx.hash).toPromise();
@@ -153,8 +150,7 @@ console.log(txStatus);
 txInfo = await txRepo.getTransaction(signedTx.hash,sym.TransactionGroup.Confirmed).toPromise();
 console.log(txInfo); 
 ```
-
-出力例
+###### 出力例
 ```js
 > TransactionStatus
     code: "Success"
