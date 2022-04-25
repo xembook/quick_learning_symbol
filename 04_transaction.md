@@ -3,6 +3,8 @@
 
 ## 4.1 トランザクションのライフサイクル
 
+トランザクションを作成してから、改ざんが困難なデータとなるまでを順に説明します。
+
 - トランザクション作成
   - ブロックチェーンが受理できるフォーマットでトランザクションを作成します。
 - 署名
@@ -32,7 +34,7 @@
 bob = sym.Account.generateNewAccount(networkType);
 console.log(bob.address);
 ```
-出力例
+###### 出力例
 ```js
 > Address {address: 'TDWBA6L3CZ6VTZAZPAISL3RWM5VKMHM6J6IM3LY', networkType: 152}
 ```
@@ -119,7 +121,7 @@ tx = sym.TransferTransaction.create(
 signedTx = alice.sign(tx,generationHash);
 console.log(signedTx);
 ```
-出力例
+###### 出力例
 ```js
 > SignedTransaction
     hash: "3BD00B0AF24DE70C7F1763B3FD64983C9668A370CB96258768B715B117D703C2"
@@ -147,7 +149,6 @@ generationHash値はそのブロックチェーンネットワークを一意に
 res = await txRepo.announce(signedTx).toPromise();
 console.log(res);
 ```
-出力例
 ```js
 > TransactionAnnounceResponse {message: 'packet 9 was pushed to the network via /transactions'}
 ```
@@ -174,7 +175,7 @@ tsRepo = repo.createTransactionStatusRepository();
 transactionStatus = await tsRepo.getTransactionStatus(signedTx.hash).toPromise();
 console.log(transactionStatus);
 ```
-出力例
+###### 出力例
 ```js
 > TransactionStatus
     group: "confirmed"
@@ -229,7 +230,7 @@ console.log(signedTx.hash);
 txInfo = await txRepo.getTransaction(signedTx.hash,sym.TransactionGroup.Confirmed).toPromise();
 console.log(txInfo);
 ```
-出力例
+###### 出力例
 ```js
 > TransferTransaction
     deadline: Deadline {adjustedValue: 12883929118}
@@ -284,8 +285,7 @@ txes.forEach(tx => {
   console.log(tx);
 })
 ```
-
-出力例
+###### 出力例
 ```js
 > TransferTransaction
     type: 16724
@@ -365,11 +365,10 @@ await txRepo.announce(signedTx).toPromise();
 まず、アグリゲートトランザクションに含めるトランザクションを作成します。
 このときDeadlineを指定する必要はありません。
 リスト化するときに、生成したトランザクションにtoAggregateを追加して送信元アカウントの公開鍵を指定します。
-送信元アカウントと署名アカウントが必ずしも一致するとは限りません。これがSymbolブロックチェーンの最も重要な考え方になります。
-本章で扱うトランザクションは同じAliceですので、アグリゲートボンデッドトランザクションへの署名もAliceを指定します。
-
-
-
+ちなみに送信元アカウントと署名アカウントが **必ずしも一致するとは限りません** 。
+後の章での解説で「Bobの送信トランザクションをAliceが署名する」といった事が起こり得るためこのような書き方をします。
+これはSymbolブロックチェーンでトランザクションを扱ううえで最も重要な概念になります。
+なお、本章で扱うトランザクションは同じAliceですので、アグリゲートボンデッドトランザクションへの署名もAliceを指定します。
 
 ## 4.7 現場で使えるヒント
 
