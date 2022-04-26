@@ -46,7 +46,9 @@ signedHash = signedTx.hash;
 signedPayload = signedTx.payload;
 
 console.log(signedPayload);
-
+```
+###### 出力例
+```js
 >580100000000000039A6555133357524A8F4A832E1E596BDBA39297BC94CD1D0728572EE14F66AA71ACF5088DB6F0D1031FF65F2BBA7DA9EE3A8ECF242C2A0FE41B6A00A2EF4B9020E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198414100AF000000000000D4641CD902000000306771D758886F1529F9B61664B0450ED138B27CC5E3AE579C16D550EDEE5791B00000000000000054000000000000000E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198544198A1BE13194C0D18897DD88FE3BC4860B8EEF79C6BC8C8720400000000000000007478310000000054000000000000003C4ADF83264FF73B4EC1DD05B490723A8CFFAE1ABBD4D4190AC4CAC1E6505A5900000000019854419850BF0FD1A45FCEE211B57D0FE2B6421EB81979814F629204000000000000000074783200000000
 ```
 
@@ -62,8 +64,7 @@ Aliceから受け取ったsignedPayloadでトランザクションを復元し�
 tx = sym.TransactionMapping.createFromPayload(signedPayload);
 console.log(tx);
 ```
-
-出力例
+###### 出力例
 ```js
 > AggregateTransaction
     cosignatures: []
@@ -92,7 +93,7 @@ res = tx.signer.verifySignature(
 );
 console.log(res);
 ```
-出力
+###### 出力例
 ```js
 > true
 ```
@@ -132,16 +133,16 @@ littleEndianSize = formatedSize.substr(6, 2) + formatedSize.substr(4, 2) + forma
 signedPayload = littleEndianSize + signedPayload.substr(8, signedPayload.length - 8);
 signedTx = new sym.SignedTransaction(signedPayload, signedHash, alice.publicKey, recreatedTx.type, recreatedTx.networkType);
 
-await txRepo.announce(signedTx,listener).toPromise();
+await txRepo.announce(signedTx).toPromise();
 ```
 
 ## 12.4 現場で使えるヒント
 
 ### マーケットプレイスレス
-ボンデッドトランザクションと異なりハッシュロックの費用を気にする必要がありません。  
-ペイロードを共有できる場が存在する場合、売り手は考えられるすべての買い手候補に対してペイロードを作成して交渉開始を待つことができます。
-この交渉に専用のマーケットプレイスを構築する必要はありません。
-SNSのタイムラインをマーケットプレイスにしたり、交通制御など必要に応じて任意の時間や空間でワンタイムマーケットプレイスを展開することができます。
+ボンデッドトランザクションと異なりハッシュロックの費用を気にする必要がありません。    
+ペイロードを共有できる場が存在する場合、売り手は考えられるすべての買い手候補に対してペイロードを作成して交渉開始を待つことができます。  
+この交渉に専用のマーケットプレイスを構築する必要はありません。  
+SNSのタイムラインをマーケットプレイスにしたり、交通制御など必要に応じて任意の時間や空間でワンタイムマーケットプレイスを展開することができます。  
 
-ただ、オフラインで署名を交換するため、なりすましのペイロード署名要求には気を付けた方がいいでしょう。
-（必ずペイロードからハッシュを生成して署名するようにしてください）
+ただ、オフラインで署名を交換するため、なりすましのペイロード署名要求には気を付けましょう。  
+（必ずペイロードからハッシュを生成して署名するようにしてください）  
