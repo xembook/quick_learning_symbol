@@ -39,8 +39,7 @@ listener.open().then(() => {
     });
 });
 ```
-
-出力例
+###### 出力例
 ```js
 > Promise {<pending>}
 > TransferTransaction {type: 16724, networkType: 152, version: 1, deadline: Deadline, maxFee: UInt64, …}
@@ -77,8 +76,7 @@ listener.open().then(() => {
     .subscribe(block=>console.log(block));
 });
 ```
-
-出力例
+###### 出力例
 ```js
 > Promise {<pending>}
 > NewBlock
@@ -117,7 +115,7 @@ listener.open().then(() => {
     .subscribe(async tx=>console.log(tx));
 });
 ```
-出力例
+###### 出力例
 ```js
 
 > AggregateTransaction
