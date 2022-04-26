@@ -5,6 +5,17 @@
 
 トランザクションがブロックヘッダーに含まれていることを検証します。
 
+本章のサンプルスクリプトを実行するまえに以下を実行して必要ライブラリを読み込んでおいてください。
+```js
+Buffer = require("/node_modules/buffer").Buffer;
+cat = require("/node_modules/catbuffer-typescript");
+sha3_256 = require('/node_modules/js-sha3').sha3_256;
+
+accountRepo = repo.createAccountRepository();
+blockRepo = repo.createBlockRepository();
+stateProofService = new sym.StateProofService(repo);
+```
+
 ### 検証するペイロード
 
 今回検証するトランザクションペイロードとそのトランザクションが記録されているとされるブロック高です。
@@ -20,8 +31,6 @@ height = 59639;
 トランザクションの内容を確認します。
 
 ```js
-Buffer = require("/node_modules/buffer").Buffer;
-
 tx = sym.TransactionMapping.createFromPayload(payload);
 hash = sym.Transaction.createTransactionHash(payload,Buffer.from(generationHash, 'hex'));
 console.log(hash);
@@ -117,8 +126,6 @@ function validateTransactionInBlock(leaf,HRoot,merkleProof){
   return HRoot.toUpperCase() === HRoot0.toUpperCase();
 }
 
-blockRepo = repo.createBlockRepository();
-
 //トランザクションから計算
 leaf = merkleComponentHash.toLowerCase();//merkleComponentHash
 
@@ -187,7 +194,7 @@ NormalBlockに加えて以下の情報が追加されています。
 
 ```js
 block = await blockRepo.getBlockByHeight(height).toPromise();
-previousBlock = await blockRepo.getBlockByHeight(targetBlockHeight - 1).toPromise();
+previousBlock = await blockRepo.getBlockByHeight(height - 1).toPromise();
 if(block.type ===  sym.BlockType.ImportanceBlock){
 
   hasher = sha3_256.create();
@@ -317,9 +324,14 @@ function checkState(stateProof,stateHash,pathHash,rootHash){
 
 ### 13.3.1 アカウント情報の検証
 
+アカウント情報を葉として、
+マークルツリー上の分岐する枝をアドレスでたどり、
+ルートに到着できるかを確認します。
 
 ```js
-aliceAddress = sym.Address.createFromRawAddress("NCESRRSDSXQW7LTYWMHZOCXAESNNBNNVXHPB6WY");
+stateProofService = new sym.StateProofService(repo);
+
+aliceAddress = sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ");
 
 hasher = sha3_256.create();
 alicePathHash = hasher.update(
@@ -341,14 +353,20 @@ checkState(stateProof,aliceStateHash,alicePathHash,rootHash);
 
 
 ### 13.3.2 モザイクへ登録したメタデータの検証
-```js
 
-srcAddress = sym.Convert.hexToUint8(
-    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded()
+モザイクに登録したメタデータValue値を葉として、
+マークルツリー上の分岐する枝をメタデータキーで構成されるハッシュ値でたどり、
+ルートに到着できるかを確認します。
+
+```js
+srcAddress = Buffer.from(
+    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded(),
+    'hex'
 )
 
-targetAddress = sym.Convert.hexToUint8(
-    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded()
+targetAddress = Buffer.from(
+    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded(),
+    'hex'
 )
 
 hasher = sha3_256.create();    
@@ -360,7 +378,8 @@ hasher.update(Uint8Array.from([sym.MetadataType.Mosaic])); // type: Account 0
 compositeHash = hasher.hex();
 
 hasher = sha3_256.create();   
-hasher.update(sym.Convert.hexToUint8(compositeHash));
+hasher.update( Buffer.from(compositeHash,'hex'));
+
 pathHash = hasher.hex().toUpperCase();
 
 //stateHash(Value値)
@@ -372,7 +391,7 @@ hasher.update(sym.Convert.hexToUint8Reverse("CF217E116AA422E2")); // scopeKey
 hasher.update(sym.Convert.hexToUint8Reverse("1275B0B7511D9161")); // targetId
 hasher.update(Uint8Array.from([sym.MetadataType.Mosaic])); //account
 
-value = sym.Convert.utf8ToUint8("test");
+value = Buffer.from("test");
 
 hasher.update(cat.GeneratorUtils.uintToBuffer(value.length, 2)); 
 hasher.update(value); 
@@ -389,14 +408,19 @@ checkState(stateProof,stateHash,pathHash,rootHash);
 
 ### 13.3.3 アカウントへ登録したメタデータの検証
 
+アカウントに登録したメタデータValue値を葉として、
+マークルツリー上の分岐する枝をメタデータキーで構成されるハッシュ値でたどり、
+ルートに到着できるかを確認します。
 
 ```js
-srcAddress = sym.Convert.hexToUint8(
-    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded()
+srcAddress = Buffer.from(
+    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded(),
+    'hex'
 )
 
-targetAddress = sym.Convert.hexToUint8(
-    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded()
+targetAddress = Buffer.from(
+    sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ").encoded(),
+    'hex'
 )
 
 //compositePathHash(Key値)
@@ -409,7 +433,8 @@ hasher.update(Uint8Array.from([sym.MetadataType.Account])); // type: Account 0
 compositeHash = hasher.hex();
 
 hasher = sha3_256.create();   
-hasher.update(sym.Convert.hexToUint8(compositeHash));
+hasher.update( Buffer.from(compositeHash,'hex'));
+
 pathHash = hasher.hex().toUpperCase();
 
 //stateHash(Value値)
@@ -420,7 +445,7 @@ hasher.update(targetAddress);
 hasher.update(sym.Convert.hexToUint8Reverse("9772B71B058127D7")); // scopeKey
 hasher.update(sym.Convert.hexToUint8Reverse("0000000000000000")); // targetId
 hasher.update(Uint8Array.from([sym.MetadataType.Account])); //account
-value = sym.Convert.utf8ToUint8("test");
+value = Buffer.from("test");
 hasher.update(cat.GeneratorUtils.uintToBuffer(value.length, 2)); 
 hasher.update(value); 
 stateHash = hasher.hex();
