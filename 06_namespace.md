@@ -61,10 +61,10 @@ await txRepo.announce(signedTx).toPromise();
 サブネームスペースをレンタルします(例:xembook.tomato)
 ```js
 subNamespaceTx = sym.NamespaceRegistrationTransaction.createSubNamespace(
-	sym.Deadline.create(epochAdjustment),
-	"tomato",  //作成するサブネームスペース
-	"xembook", //紐づけたいルートネームスペース
-	networkType,
+    sym.Deadline.create(epochAdjustment),
+    "tomato",  //作成するサブネームスペース
+    "xembook", //紐づけたいルートネームスペース
+    networkType,
 ).setMaxFee(100);
 signedTx = alice.sign(subNamespaceTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
@@ -75,10 +75,10 @@ await txRepo.announce(signedTx).toPromise();
 
 ```js
 subNamespaceTx = sym.NamespaceRegistrationTransaction.createSubNamespace(
-	,
-	"morning",  //作成するサブネームスペース
-	"xembook.tomato", //紐づけたいルートネームスペース
-	,
+    ,
+    "morning",  //作成するサブネームスペース
+    "xembook.tomato", //紐づけたいルートネームスペース
+    ,
 )
 ```
 
@@ -111,26 +111,26 @@ console.log(endDate);
 ```
 ## 6.3 リンク
 
-アカウントへのリンクします。
+### アカウントへのリンク
 ```js
 namespaceId = new sym.NamespaceId("xembook");
 address = sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ");
 tx = sym.AliasTransaction.createForAddress(
-	sym.Deadline.create(epochAdjustment),
-	sym.AliasAction.Link,
-	namespaceId,
-	address,
-	networkType
+    sym.Deadline.create(epochAdjustment),
+    sym.AliasAction.Link,
+    namespaceId,
+    address,
+    networkType
 ).setMaxFee(100);
 signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
-
 ```
+リンク先のアドレスは自分が所有していなくても問題ありません。
 
-モザイクへリンクします。
+### モザイクへリンク
 ```js
 namespaceId = new sym.NamespaceId("xembook.tomato");
-mosaicId = new sym.MosaicId("6BED913FA20223F8");
+mosaicId = new sym.MosaicId("3A8416DB2D53xxxx");
 tx = sym.AliasTransaction.createForMosaic(
     sym.Deadline.create(epochAdjustment),
     sym.AliasAction.Link,
@@ -140,8 +140,10 @@ tx = sym.AliasTransaction.createForMosaic(
 ).setMaxFee(100);
 signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
-
 ```
+
+モザイクを作成したアドレスと同一の場合のみリンクできるようです。
+
 
 ## 6.4 未解決で使用
 
@@ -150,40 +152,41 @@ await txRepo.announce(signedTx).toPromise();
 ```js
 namespaceId = new sym.NamespaceId("xembook");
 tx = sym.TransferTransaction.create(
-	sym.Deadline.create(epochAdjustment),
-	namespaceId, //UnresolvedAccount:未解決アカウントアドレス
-	[],
-	sym.EmptyMessage,
-	networkType
+    sym.Deadline.create(epochAdjustment),
+    namespaceId, //UnresolvedAccount:未解決アカウントアドレス
+    [],
+    sym.EmptyMessage,
+    networkType
 ).setMaxFee(100);
 signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 送信モザイクにUnresolvedMosaicとして指定して、モザイクIDを特定しないままトランザクションを署名・アナウンスします。
-XYMをネームスペースで使用する場合は以下のように指定します。
 
 ```js
 namespaceId = new sym.NamespaceId("xembook.tomato");
 tx = sym.TransferTransaction.create(
-	sym.Deadline.create(epochAdjustment),
-	address, 
-	[
-    new sym.Mosaic(
-      namespaceId,//UnresolvedMosaic:未解決モザイク
-      sym.UInt64.fromUint(1) //送信量
-    )
-  ],
-	sym.EmptyMessage,
-	networkType
+    sym.Deadline.create(epochAdjustment),
+    address, 
+    [
+        new sym.Mosaic(
+          namespaceId,//UnresolvedMosaic:未解決モザイク
+          sym.UInt64.fromUint(1) //送信量
+        )
+    ],
+    sym.EmptyMessage,
+    networkType
 ).setMaxFee(100);
 signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
+XYMをネームスペースで使用する場合は以下のように指定します。
 
 ```js
 namespaceId = new sym.NamespaceId("symbol.xym");
-
+```
+```js
 > NamespaceId {fullName: 'symbol.xym', id: Id}
     fullName: "symbol.xym"
     id: Id {lower: 1106554862, higher: 3880491450}
@@ -202,12 +205,20 @@ console.log(namespaceInfo);
 ```
 ###### 出力例
 ```js
-> NamespaceInfo
-	> alias: AddressAlias
-		> address: Address
-			address: "NCESRRSDSXQW7LTYWMHZOCXAESNNBNNVXHPB6WY"
-		type: 2
-		mosaicId: undefined
+NamespaceInfo
+    active: true
+  > alias: AddressAlias
+        address: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+        mosaicId: undefined
+        type: 2 //AliasType
+    depth: 1
+    endHeight: UInt64 {lower: 500545, higher: 0}
+    index: 1
+    levels: [NamespaceId]
+    ownerAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+    parentId: NamespaceId {id: Id}
+    registrationType: 0 //NamespaceRegistrationType
+    startHeight: UInt64 {lower: 324865, higher: 0}
 ```
 
 AliasTypeは以下の通りです。
@@ -229,13 +240,21 @@ console.log(namespaceInfo);
 ```
 ###### 出力例
 ```js
-> NamespaceInfo 
-	> alias: MosaicAlias
-		> mosaicId: MosaicId
-			id: Id {lower: 2316569883, higher: 822311105}
-		type: 1
-		address: undefined
-
+NamespaceInfo
+  > active: true
+    alias: MosaicAlias
+        address: undefined
+        mosaicId: MosaicId
+        id: Id {lower: 1360892257, higher: 309702839}
+        type: 1 //AliasType
+    depth: 2
+    endHeight: UInt64 {lower: 500545, higher: 0}
+    index: 1
+    levels: (2) [NamespaceId, NamespaceId]
+    ownerAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
+    parentId: NamespaceId {id: Id}
+    registrationType: 1 //NamespaceRegistrationType
+    startHeight: UInt64 {lower: 324865, higher: 0}
 ```
 
 ### 逆引き
@@ -245,7 +264,7 @@ console.log(namespaceInfo);
 nsRepo = repo.createNamespaceRepository();
 
 accountNames = await nsRepo.getAccountsNames(
-  [sym.Address.createFromRawAddress("NBVHIH5E25AFIRQUYOEMZ35FKEOI275O36YMLZI")]
+  [sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ")]
 ).toPromise();
 
 namespaceIds = accountNames[0].names.map(name=>{
@@ -260,6 +279,7 @@ console.log(namespaceIds);
 トランザクションに使用されたネームスペースをブロックチェーン側がどう解決したかを確認します。
 
 ```js
+receiptRepo = repo.createReceiptRepository();
 state = await receiptRepo.searchAddressResolutionStatements({height:179401}).toPromise();
 ```
 ###### 出力例
@@ -271,7 +291,7 @@ data: Array(1)
       0: ResolutionEntry
         resolved: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152}
         source: ReceiptSource {primaryId: 1, secondaryId: 0}
-    resolutionType: 0
+    resolutionType: 0 //ResolutionType
     unresolved: NamespaceId
       id: Id {lower: 646738821, higher: 2754876907}
 ```
@@ -289,4 +309,19 @@ ResolutionTypeは以下の通りです。
 
 ## 6.6 現場で使えるヒント
 
-(現在執筆中)
+### 外部ドメインとの相互リンク
+
+ネームスペースは重複取得がプロトコル上制限されているため、
+インターネットドメインや実世界で周知されている商標名と同一ネームスペースを取得し、
+外部(公式サイトや印刷物など)からネームスペース存在の認知を公表することで、
+Symbol上のアカウントのブランド価値を構築することができます。
+(法的な効力については調整が必要です)
+外部ドメイン側のハッキングあるいは、Symbol側でのネームスペース更新忘れにはご注意ください。
+
+
+#### ネームスペースを取得するアカウントについての注意
+ネームスペースはレンタル期限という概念をもつ機能です。
+今のところ、取得したネームスペース放棄か延長の選択肢しかありません。
+運用譲渡などが発生する可能性のあるシステムでネームスペース活用を検討する場合は
+マルチシグ化(9章)したアカウントでネームスペースを取得することをおすすめします。
+
