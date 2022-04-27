@@ -96,7 +96,7 @@ sym.RawMessage.create(uint8Arrays[i])
 
 トランザクションサイズ x feeMultiprilerというもので決定されます。
 176バイトだった場合 maxFee を100で設定すると 17600μXYM = 0.0176XYMを手数料として支払うことを許容します。
-feeMultiprier = 100として指定する方法とmaxFee = 176000 として指定する方法があります。
+feeMultiprier = 100として指定する方法とmaxFee = 17600 として指定する方法があります。
 
 ##### feeMultiprier = 100として指定する方法
 ```js
@@ -106,7 +106,7 @@ tx = sym.TransferTransaction.create(
 ).setMaxFee(100);
 ```
 
-##### maxFee = 176000 として指定する方法
+##### maxFee = 17600 として指定する方法
 ```js
 tx = sym.TransferTransaction.create(
   ,,,,
