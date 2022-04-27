@@ -68,9 +68,13 @@ await txRepo.announce(signedTx).toPromise();
 
 ### マルチシグ化したアカウントの確認
 ```js
+msigRepo = repo.createMultisigRepository();
+
 multisigInfo = await msigRepo.getMultisigAccountInfo(bob.address).toPromise();
 console.log(multisigInfo);
-
+```
+###### 出力例
+```js
 > MultisigAccountInfo 
     accountAddress: Address {address: 'TCOMA5VG67TZH4X55HGZOXOFP7S232CYEQMOS7Q', networkType: 152}
   > cosignatoryAddresses: Array(3)
@@ -88,6 +92,8 @@ minRemoval: 1により連署者を取り外すために必要な署名者数は1
 
 ### 連署者アカウントの確認
 ```js
+msigRepo = repo.createMultisigRepository();
+
 multisigInfo = await msigRepo.getMultisigAccountInfo(carol1.address).toPromise();
 console.log(multisigInfo);
 
@@ -180,7 +186,9 @@ txRepo.announceAggregateBonded(signedAggregateTx);
 ```js
 txInfo = await txRepo.getTransaction(signedTx.hash,sym.TransactionGroup.Confirmed).toPromise();
 console.log(txInfo);
-
+```
+###### 出力例
+```js
 > AggregateTransaction
   > cosignatures: Array(2)
 		0: AggregateTransactionCosignature
@@ -306,4 +314,16 @@ await txRepo.announce(signedTx).toPromise();
 
 ## 9.6 現場で使えるヒント
 
-後日執筆予定
+### 多要素認証
+
+秘密鍵の管理を複数の端末に分散させることができます。
+セキュリティ用の鍵を用意しておけば、紛失・漏洩時にも安全に回復することができます。
+
+
+### アカウントの所有
+
+マルチシグ化したアカウントの秘密鍵は無効化し、マルチシグを解除しない限りたとえ秘密鍵を知っていたとしても
+モザイク送信などはできなくなります。
+モザイクの章で説明した通り、所有を「自分の意思で手放すことができる状態」だとすると、
+マルチシグ化したアカウントがもつモザイク等の所有者は連署者になります。
+また、Symbolではマルチシグの構成変更が可能ですのでアカウントの所有を他の連署者に安全に移転することができます。
