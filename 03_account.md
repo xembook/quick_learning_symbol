@@ -1,5 +1,3 @@
-# 3.アカウント
-
 アカウントは秘密鍵に紐づく情報が記録されたデータ構造体です。  
 アカウントと関連づいた秘密鍵を使って署名することでのみブロックチェーンのデータを更新することができます。  
 
@@ -13,7 +11,7 @@
 alice = sym.Account.generateNewAccount(networkType);
 console.log(alice);
 ```
-###### 出力例
+出力例
 ```js
 > Account
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
@@ -45,8 +43,7 @@ console.log(alice.publicKey);
 ```js
 aliceRawAddress = alice.address.plain();
 console.log(aliceRawAddress);
-```
-```js
+
 > TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ
 ```
 
@@ -69,7 +66,7 @@ alicePublicAccount = sym.PublicAccount.createFromPublicKey(
 );
 console.log(alicePublicAccount);
 ```
-###### 出力例
+出力例
 ```js
 > PublicAccount
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
@@ -84,7 +81,7 @@ aliceAddress = sym.Address.createFromRawAddress(
 );
 console.log(aliceAddress);
 ```
-###### 出力例
+出力例
 ```js
 > Address
     address: "TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ"
@@ -135,7 +132,7 @@ accountRepo = repo.createAccountRepository();
 accountInfo = await accountRepo.getAccountInfo(aliceAddress).toPromise();
 console.log(accountInfo);
 ```
-###### 出力例
+出力例
 ```js
 > AccountInfo
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
@@ -224,7 +221,7 @@ decryptMessage = bob.decryptMessage(
 console.log(decryptMessage);
 ```
 ```js
-> "Hello Symol!"
+>"Hello Symol!"
 ```
 
 #### 署名
@@ -237,7 +234,7 @@ payload = Buffer.from("Hello Symol!", 'utf-8');
 signature = Buffer.from(sym.KeyPair.sign(alice.keyPair, payload)).toString("hex").toUpperCase();
 console.log(signature);
 ```
-```
+```js
 > B8A9BCDE9246BB5780A8DED0F4D5DFC80020BBB7360B863EC1F9C62CAFA8686049F39A9F403CB4E66104754A6AEDEF8F6B4AC79E9416DEEDC176FDD24AFEC60E
 ```
 
@@ -283,7 +280,6 @@ signerQR.toBase64().subscribe(x =>{
 //アカウントを暗号化したJSONデータとして表示
 console.log(signerQR.toJSON());
 ```
-###### 出力例
 ```js
 > {"v":3,"type":2,"network_id":152,"chain_id":"7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836",
     "data":{
