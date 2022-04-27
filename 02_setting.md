@@ -16,7 +16,6 @@ https://github.com/xembook/nem2-browserify
 ##### 注意
 現在 symbol-sdk v3.0.0がアルファ版としてリリースされており、v 2.0.0はdeprecatedです。  
 v3ではrxjsに依存した多くの機能が削除されるため、REST APIへの直接アクセスが推奨されます。  
-
  
 ### リファレンス
 Symbol SDK for TypeScript and JavaScript  
@@ -81,7 +80,17 @@ txRepo = repo.createTransactionRepository();
     generationHash = await repo.getGenerationHash().toPromise();
     epochAdjustment = await repo.getEpochAdjustment().toPromise();
 })();
+
+function clog(signedTx){
+    console.log(NODE + "/transactionStatus/" + signedTx.hash);
+    console.log(NODE + "/transactions/confirmed/" + signedTx.hash);
+    console.log("https://symbol.fyi/transactions/" + signedTx.hash);
+    console.log("https://testnet.symbol.fyi/transactions/" + signedTx.hash);
+}
 ```
 
 これで準備完了です。  
-4章以降は3章で作成したXYMを受信したAliceアカウントを準備していることが前提となりますのでご注意ください。
+
+本ドキュメントの内容が少し分かりにくい場合はQiita等の記事もご参考ください。
+
+[Symbolブロックチェーンのテストネットで送金を体験する](https://qiita.com/nem_takanobu/items/e2b1f0aafe7a2df0fe1b)
