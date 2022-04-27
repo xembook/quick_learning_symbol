@@ -255,7 +255,7 @@ console.log(res);
 ###### 出力例
 ```js
 > data
-	> 0: MosaicGlobalRestriction
+    > 0: MosaicGlobalRestriction
       compositeHash: "68FBADBAFBD098C157D42A61A7D82E8AF730D3B8C3937B1088456432CDDB8373"
       entryType: 1
     > mosaicId: MosaicId
@@ -265,7 +265,7 @@ console.log(res);
           key: UInt64 {lower: 2424036727, higher: 2165465980}
           restrictionType: 1
           restrictionValue: UInt64 {lower: 1, higher: 0}
-	> 1: MosaicAddressRestriction
+    > 1: MosaicAddressRestriction
       compositeHash: "920BFD041B6D30C0799E06585EC5F3916489E2DDF47FF6C30C569B102DB39F4E"
       entryType: 0
     > mosaicId: MosaicId
@@ -325,7 +325,7 @@ await txRepo.announce(signedTx).toPromise();
 ### アカウントバーン
 
 AllowIncomingAddressによって指定アドレスからのみ受信可能にしておいて、  
-XYMを全量送信すると、秘密鍵を持っていても操作困難なアカウントを明示的に作成することができます。  
+XYMを全量送信すると、秘密鍵を持っていても自力では操作困難なアカウントを明示的に作成することができます。  
 （最小手数料を0に設定したノードによって承認されることもあり、その可能性はゼロではありません）  
 
 ### モザイクロック
