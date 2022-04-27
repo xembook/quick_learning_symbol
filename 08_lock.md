@@ -54,10 +54,10 @@ signedAggregateTx = alice.sign(aggregateTx, generationHash);
 //ハッシュロックTX作成
 hashLockTx = sym.HashLockTransaction.create(
   sym.Deadline.create(epochAdjustment),
-	networkCurrency.createRelative(10),//固定値
-	sym.UInt64.fromUint(480), // ロック有効期限
-	signedAggregateTx,// このハッシュ値を登録
-	networkType
+    networkCurrency.createRelative(10),//固定値
+    sym.UInt64.fromUint(480), // ロック有効期限
+    signedAggregateTx,// このハッシュ値を登録
+    networkType
 ).setMaxFee(100);
 
 //署名
