@@ -113,6 +113,8 @@ console.log("https://testnet.symbol.tools/?recipient=" + bob.address.plain() +"&
 ロック・解除にかかわる共通暗号を作成します。
 
 ```js
+sha3_256 = require('/node_modules/js-sha3').sha3_256;
+
 random = sym.Crypto.randomBytes(20);
 hash = sha3_256.create();
 secret = hash.update(random).hex(); //ロック用キーワード
@@ -121,7 +123,7 @@ console.log("secret:" + secret);
 console.log("proof:" + proof);
 ```
 
-出力例
+###### 出力例
 ```js
 > secret:f260bfb53478f163ee61ee3e5fb7cfcaf7f0b663bc9dd4c537b958d4ce00e240
   proof:7944496ac0f572173c2549baf9ac18f893aab6d0
@@ -160,8 +162,7 @@ slRepo = repo.createSecretLockRepository();
 res = await slRepo.search({secret:secret}).toPromise();
 console.log(res.data[0]);
 ```
-
-出力例
+###### 出力例
 ```js
 > SecretLockInfo
     amount: UInt64 {lower: 1000000, higher: 0}
@@ -204,8 +205,7 @@ await txRepo.announce(signedProofTx).toPromise();
 txInfo = await txRepo.getTransaction(signedProofTx.hash,sym.TransactionGroup.Confirmed).toPromise();
 console.log(txInfo);
 ```
-
-出力例
+###### 出力例
 ```js
 > SecretProofTransaction
   > deadline: Deadline {adjustedValue: 12669305546}
@@ -231,14 +231,15 @@ SecretProofTransactionにはモザイクの受信量の情報は含まれてい�
 レシートタイプ:LockHash_Completed でBob宛のレシートを検索してみます。
 
 ```js
+receiptRepo = repo.createReceiptRepository();
+
 receiptInfo = await receiptRepo.searchReceipts({
     receiptType:sym.ReceiptTypeLockHash_Completed,
     targetAddress:bob.address
 }).toPromise();
 console.log(receiptInfo.data);
 ```
-
-出力例
+###### 出力例
 ```js
 > data: Array(1)
   >  0: TransactionStatement
@@ -264,5 +265,16 @@ ReceiptTypeは以下の通りです。
 
 ## 8.3 現場で使えるヒント
 
-(現在執筆中)
 
+### 手数料代払い
+
+ハッシュロックは誰が発行しても問題ありません。
+ただし、ロックされたアグリゲートトランザクションの内部にハッシュロックしたアカウントが含まれている必要があります。
+ユーザがXYMを所有しない場合、ハッシュロック費用とネットワーク手数料をサービス提供者が負担することで送信を実現することができます。
+
+### タイマー送金
+
+シークレットロックは指定ブロック数を経過すると元のアカウントへ払い戻されます。
+この原理を利用して、シークレットロックしたアカウントにたいしてロック分の費用をサービス提供者が充足しておけば、
+期限が過ぎた後ユーザ側がロック分のトークン所有量が増加することになります。
+一方で、期限が過ぎる前にシークレット証明トランザクションをアナウンスすると、送信が完了し、サービス提供者に充当戻るためキャンセル扱いとなります。
