@@ -3,16 +3,18 @@
 アカウント・モザイク・ネームスペースに対してKey-Value形式のデータを登録することができます。  
 Valueの最大値は1024バイトです。
 本章ではモザイク・ネームスペースの作成アカウントとメタデータの作成アカウントがどちらもAliceであることを前提に説明します。
-異なるアカウントが作成したモザイクやネームスペースに対してメタデータを登録する場合は、この後の章で紹介するアグリゲートボンデッドトランザクション、オフライン署名を参考にしてください。
 
+本章のサンプルスクリプトを実行するまえに以下を実行して必要ライブラリを読み込んでおいてください。
+```js
+metaRepo = repo.createMetadataRepository();
+mosaicRepo = repo.createMosaicRepository();
+metaService = new sym.MetadataTransactionService(metaRepo);
+```
 ## 7.1 アカウントに登録
 
 アカウントに対して、Key-Value値を登録します。
 
 ```js
-metaRepo = repo.createMetadataRepository();
-metaService = new sym.MetadataTransactionService(metaRepo);
-
 key = sym.KeyGenerator.generateUInt64Key("key_account");
 value = "test";
 
@@ -41,24 +43,23 @@ await txRepo.announce(signedTx).toPromise();
 signTransactionWithCosignatoriesを使用します。
 
 ```js
-    tx = await metaService.createAccountMetadataTransaction(
-        undefined,
-        networkType,
-        bob.address, //メタデータ記録先アドレス
-        key,value, //Key-Value値
-        alice.address //メタデータ作成者アドレス
-    ).toPromise();
+tx = await metaService.createAccountMetadataTransaction(
+    undefined,
+    networkType,
+    bob.address, //メタデータ記録先アドレス
+    key,value, //Key-Value値
+    alice.address //メタデータ作成者アドレス
+).toPromise();
 
-    aggregateTx = sym.AggregateTransaction.createComplete(
-      sym.Deadline.create(epochAdjustment),
-      [tx.toAggregate(alice.publicAccount)],
-      networkType,[]
-    ).setMaxFeeForAggregate(100, 1); // 第二引数に連署者の数:1
+aggregateTx = sym.AggregateTransaction.createComplete(
+  sym.Deadline.create(epochAdjustment),
+  [tx.toAggregate(alice.publicAccount)],
+  networkType,[]
+).setMaxFeeForAggregate(100, 1); // 第二引数に連署者の数:1
 
-    signedTx = aggregateTx.signTransactionWithCosignatories(
-      alice,[bob],generationHash,// 第二引数に連署者
-    );
-    await txRepo.announce(signedTx).toPromise();
+signedTx = aggregateTx.signTransactionWithCosignatories(
+  alice,[bob],generationHash,// 第二引数に連署者
+);
 ```
 
 bobの秘密鍵が分からない場合はこの後の章で説明する
@@ -70,10 +71,6 @@ bobの秘密鍵が分からない場合はこの後の章で説明する
 登録・更新にはモザイクを作成したアカウントの署名が必要です。
 
 ```js
-metaRepo = repo.createMetadataRepository();
-mosaicRepo = repo.createMosaicRepository();
-metaService = new sym.MetadataTransactionService(metaRepo);
-
 mosaicId = new sym.MosaicId("1275B0B7511D9161");
 mosaicInfo = await mosaicRepo.getMosaic(mosaicId).toPromise();
 
@@ -105,10 +102,6 @@ await txRepo.announce(signedTx).toPromise();
 登録・更新にはネームスペースを作成したアカウントの署名が必要です。
 
 ```js
-nsRepo = repo.createNamespaceRepository();
-metaRepo = repo.createMetadataRepository();
-metaService = new sym.MetadataTransactionService(metaRepo);
-
 namespaceId = new sym.NamespaceId("xembook");
 namespaceInfo = await nsRepo.getNamespace(namespaceId).toPromise();
 
@@ -137,16 +130,13 @@ await txRepo.announce(signedTx).toPromise();
 登録したメタデータを確認します。
 
 ```js
-metaRepo = repo.createMetadataRepository();
-
 res = await metaRepo.search({
   targetAddress:alice.address,
   sourceAddress:alice.address}
 ).toPromise();
 console.log(res);
 ```
-
-出力例
+###### 出力例
 ```js
 data: Array(3)
   0: Metadata
@@ -191,4 +181,19 @@ sym.MetadataType
 
 ## 7.5 現場で使えるヒント
 
-(現在執筆中)
+### 有資格証明
+
+モザイクの章で所有証明、ネームスペースの章でドメインリンクの説明をしました。
+実社会で信頼性の高いドメインからリンクされたアカウントが発行したメタデータの付与を受けることで
+そのドメイン内での有資格情報の所有を証明することができます。
+
+#### DID
+
+分散型アイデンティティと呼ばれます。
+エコシステムは発行者、所有者、検証者に分かれ、例えば大学が発行した卒業証書を学生が所有し、
+企業は学生から提示された証明書を大学が公表している公開鍵をもとに検証します。
+このやりとりにプラットフォームに依存する情報はありません。
+メタデータを活用することで、大学は学生の所有するアカウントにメタデータを発行することができ、
+企業は大学の公開鍵と学生のモザイク(アカウント)所有証明でメタデータに記載された卒業証明を検証することができます。
+
+
