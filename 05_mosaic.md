@@ -192,4 +192,71 @@ TransferTransactionのmosaicsに2種類のモザイクが送信されている�
 
 ## 5.3 現場で使えるヒント
 
-(現在執筆中)
+### 所有証明
+
+前章でトランザクションによる存在証明について説明しました。
+アカウントの作成した送信指示が消せない形で残せるので、絶対につじつまの合う台帳を作ることができます。
+絶対に消せないすべてのアカウントの送信指示の蓄積結果として、各アカウントは自分のモザイク所有を証明することができます。
+（本ドキュメントでは所有を「自分の意思で手放すことができる状態」とします）
+
+#### NFT(non fungible token)
+
+発行枚数を1に限定し、upplyMutableをtrueに設定することで、1つだけしか存在しないトークンを発行できます。
+モザイクを作成したアカウントアドレスを改ざんできない情報として保有しているので、
+そのアカウントの送信トランザクションをメタ情報として利用できます。
+
+処理概要は以下の通りです。
+```js
+upplyMutable = false; //供給量変更の可否
+
+//モザイク定義
+mosaicDefTx = sym.MosaicDefinitionTransaction.create(
+    undefined, nonce,mosaicId
+    sym.MosaicFlags.create(upplyMutable, transferable, restrictable, revokable),
+    0,//divisibility:可分性
+    sym.UInt64.fromUint(0), //duration:無期限
+);
+
+//モザイク数量固定
+mosaicChangeTx = sym.MosaicSupplyChangeTransaction.create(
+    undefined,mosaicId,
+    sym.MosaicSupplyChangeAction.Increase, //増やす
+    sym.UInt64.fromUint(1), //数量1
+);
+
+//NFTデータ
+nftTx  = sym.TransferTransaction.create(
+    undefined, //Deadline:有効期限
+    alice.address, 
+    [],
+    sym.PlainMessage.create("Hello Symbol!"), //NFTデータ実体
+)
+
+//モザイクの生成とNFTデータをアグリゲートしてブロックに登録
+aggregateTx = sym.AggregateTransaction.createComplete(
+    sym.Deadline.create(epochAdjustment),
+    [
+      mosaicDefTx.toAggregate(alice.publicAccount),
+      mosaicChangeTx.toAggregate(alice.publicAccount),
+      nftTx.toAggregate(alice.publicAccount)
+    ],
+    networkType,[],
+).setMaxFeeForAggregate(100, 0);
+```
+
+モザイク生成時のブロック高と作成アカウントはモザイク情報に含まれるので同ブロック内のトランザクションを検索することにより、
+紐づけられたNFTデータを取得することができます。
+
+#### 回収可能なポイント運用
+
+transferableをtrueに設定することで転売が制限されるため、資金決済法の影響を受けにくいポイントを定義することができます。
+またrevokableをtrueに設定することで、ユーザ側が秘密鍵を管理しなくても使用分を回収できるようなポイント運用を行うことができます。
+
+```js
+transferable = false; //第三者への譲渡可否
+revokable = true; //発行者からの還収可否
+```
+
+
+
+
