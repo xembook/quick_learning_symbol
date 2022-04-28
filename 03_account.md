@@ -203,7 +203,7 @@ console.log(encryptedMessage);
 #### 復号化
 ```js
 decryptMessage = bob.decryptMessage(
-  new nem.EncryptedMessage(
+  new sym.EncryptedMessage(
     "294C8979156C0D941270BAC191F7C689E93371EDBC36ADD8B920CF494012A97BA2D1A3759F9A6D55D5957E9D"
   ),
   alice.publicAccount
