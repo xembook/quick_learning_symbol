@@ -148,6 +148,7 @@ console.log(accountInfo);
 JavaScriptでは大きすぎる数値はあふれてしまうため、idやamountはUInt64というフォーマットで管理されています。文字列に変換する場合は toString()、数値に変換する場合は compact()、16進数にする場合は toHex() で変換してください。  
 
 ```js
+mosaicRepo = repo.createMosaicRepository();
 accountInfo.mosaics.forEach(async mosaic => {
   console.log("id:" + mosaic.id.toHex());
   console.log("amount:" + mosaic.amount.toString());
@@ -164,7 +165,8 @@ accountInfo.mosaics.forEach(async mosaic => {
 所有するトークンの量は誤差の発生を防ぐため、整数値で扱います。トークンの定義から可分性を取得することができるので、その値を使って正確な所有量を表示してみます。  
 
 ```js
-mosaicAmount = mosaics[0].amount.toString();
+mosaicRepo = repo.createMosaicRepository();
+mosaicAmount = accountInfo.mosaics[0].amount.toString();
 mosaicInfo = await mosaicRepo.getMosaic(mosaics[0].id).toPromise();
 divisibility = mosaicInfo.divisibility; //可分性
 if(divisibility > 0){
