@@ -20,7 +20,7 @@ bob = sym.Account.generateNewAccount(networkType);
 
 tx = sym.AccountRestrictionTransaction.createAddressRestrictionModificationTransaction(
   sym.Deadline.create(epochAdjustment),
-  sym.AddressRestrictionFlag.BlockIncomingAddress,
+  sym.AddressRestrictionFlag.BlockIncomingAddress, //アドレス制限フラグ
   [bob.address],//設定アドレス
   [],　　　　　　//解除アドレス
   networkType
@@ -45,7 +45,7 @@ AddressRestrictionFlagにはAllowIncomingAddressのほか、上記のような�
 mosaicId = new sym.MosaicId("3A8416DB2D53B6C8"); //テストネット XYM
 tx = sym.AccountRestrictionTransaction.createMosaicRestrictionModificationTransaction(
   sym.Deadline.create(epochAdjustment),
-  sym.MosaicRestrictionFlag.BlockMosaic,
+  sym.MosaicRestrictionFlag.BlockMosaic, //モザイク制限フラグ
   [mosaicId],//設定モザイク
   [],//解除モザイク
   networkType
@@ -63,6 +63,7 @@ MosaicRestrictionFlagについては以下の通りです。
 - BlockMosaic：指定モザイクを含むトランザクションを受信拒否
 
 モザイク送信の制限機能はありません。
+また、後述するモザイクのふるまいを制限するグローバルモザイク制限と混同しないようにご注意ください。
 
 ### 指定トランザクションの送信制限
 
@@ -95,7 +96,7 @@ TransactionTypeについては以下の通りです。
 
 ##### 注意事項
 17232: 'ACCOUNT_OPERATION_RESTRICTION' の制限は許可されていません。
-AllowOutgoingTransactionTypeを指定する場合は、ACCOUNT_OPERATION_RESTRICTIONを必ず含める必要があり、
+つまり、AllowOutgoingTransactionTypeを指定する場合は、ACCOUNT_OPERATION_RESTRICTIONを必ず含める必要があり、
 BlockOutgoingTransactionTypeを指定する場合は、ACCOUNT_OPERATION_RESTRICTIONを含めることはできません。
 
 
@@ -141,10 +142,10 @@ mosaicResService = new sym.MosaicRestrictionTransactionService(resMosaicRepo,nsR
 
 ### グローバル制限機能つきモザイクの作成
 ```js
-upplyMutable = true;
-transferable = true;
-restrictable = true;
-revokable = true;
+upplyMutable = true; //供給量変更の可否
+transferable = true; //第三者への譲渡可否
+restrictable = true; //制限設定の可否
+revokable = true; //発行者からの還収可否
 
 nonce = sym.MosaicNonce.createRandom();
 mosaicDefTx = sym.MosaicDefinitionTransaction.create(
@@ -333,6 +334,6 @@ XYMを全量送信すると、秘密鍵を持っていても自力では操作�
 
 ### 所属証明
 モザイクの章で所有の証明について説明しました。グローバルモザイク制限を活用することで、
-KYCが済んだアカウント間でのみ所有・流通させることが可能なモザイクを作ることができ、独自経済圏を構築することが可能です。
+KYCが済んだアカウント間でのみ所有・流通させることが可能なモザイクを作り、所有者のみが所属できる独自経済圏を構築することが可能です。
 
 
