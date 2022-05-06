@@ -142,7 +142,7 @@ mosaicResService = new sym.MosaicRestrictionTransactionService(resMosaicRepo,nsR
 
 ### グローバル制限機能つきモザイクの作成
 ```js
-upplyMutable = true; //供給量変更の可否
+supplyMutable = true; //供給量変更の可否
 transferable = true; //第三者への譲渡可否
 restrictable = true; //制限設定の可否
 revokable = true; //発行者からの還収可否
@@ -152,7 +152,7 @@ mosaicDefTx = sym.MosaicDefinitionTransaction.create(
     undefined,
     nonce,
     sym.MosaicId.createFromNonce(nonce, carol.address),
-    sym.MosaicFlags.create(upplyMutable, transferable, restrictable, revokable),
+    sym.MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
     0,//divisibility
     sym.UInt64.fromUint(0), //duration
     networkType
