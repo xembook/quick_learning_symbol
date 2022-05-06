@@ -10,7 +10,7 @@ Symbolではトークンのことをモザイクと表現します。
 モザイク生成には
 作成するモザイクを定義します。
 ```js
-upplyMutable = true; //供給量変更の可否
+supplyMutable = true; //供給量変更の可否
 transferable = false; //第三者への譲渡可否
 restrictable = true; //制限設定の可否
 revokable = true; //発行者からの還収可否
@@ -21,7 +21,7 @@ mosaicDefTx = sym.MosaicDefinitionTransaction.create(
     undefined, 
     nonce,
     sym.MosaicId.createFromNonce(nonce, alice.address), //モザイクID
-    sym.MosaicFlags.create(upplyMutable, transferable, restrictable, revokable),
+    sym.MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
     2,//divisibility:可分性
     sym.UInt64.fromUint(0), //duration:有効期限
     networkType
@@ -32,7 +32,7 @@ MosaicFlagsは以下の通りです。
 
 ```js
 MosaicFlags {
-  upplyMutable: false, transferable: false, restrictable: false, revokable: false
+  supplyMutable: false, transferable: false, restrictable: false, revokable: false
 }
 ```
 数量変更、第三者への譲渡、モザイクグローバル制限の適用、発行者からの還収の可否について指定します。
@@ -64,7 +64,7 @@ mosaicChangeTx = sym.MosaicSupplyChangeTransaction.create(
     networkType
 );
 ```
-upplyMutable:falseの場合、全モザイクが発行者にある場合だけ数量の変更が可能です。
+supplyMutable:falseの場合、全モザイクが発行者にある場合だけ数量の変更が可能です。
 divisibility > 0 の場合は、最小単位を1として整数値で定義してください。
 （divisibility:2 で 1.00 作成したい場合は100と指定）
 
@@ -201,18 +201,18 @@ TransferTransactionのmosaicsに2種類のモザイクが送信されている�
 
 #### NFT(non fungible token)
 
-発行枚数を1に限定し、upplyMutableをtrueに設定することで、1つだけしか存在しないトークンを発行できます。
+発行枚数を1に限定し、supplyMutableをtrueに設定することで、1つだけしか存在しないトークンを発行できます。
 モザイクを作成したアカウントアドレスを改ざんできない情報として保有しているので、
 そのアカウントの送信トランザクションをメタ情報として利用できます。
 
 処理概要は以下の通りです。
 ```js
-upplyMutable = false; //供給量変更の可否
+supplyMutable = false; //供給量変更の可否
 
 //モザイク定義
 mosaicDefTx = sym.MosaicDefinitionTransaction.create(
     undefined, nonce,mosaicId
-    sym.MosaicFlags.create(upplyMutable, transferable, restrictable, revokable),
+    sym.MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
     0,//divisibility:可分性
     sym.UInt64.fromUint(0), //duration:無期限
 );
