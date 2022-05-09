@@ -227,7 +227,7 @@ async function listenerKeepOpening(nodes){
     const lner = new sym.Listener(wsEndpoint,nsRepo,WebSocket);
     try{
         await lner.open();
-        listener.newBlock();
+        lner.newBlock();
     }catch(e){
         console.log("fail websocket");
         return await listenerKeepOpening(nodes);
