@@ -15,9 +15,9 @@ tx1 = sym.TransferTransaction.create(
     undefined,
     bob.address,  //Bobへの送信
     [ //1XYM
-      new nem.Mosaic(
-        new nem.NamespaceId("symbol.xym"),
-        nem.UInt64.fromUint(1000000)
+      new sym.Mosaic(
+        new sym.NamespaceId("symbol.xym"),
+        sym.UInt64.fromUint(1000000)
       )
     ],
     sym.EmptyMessage, //メッセージ無し
