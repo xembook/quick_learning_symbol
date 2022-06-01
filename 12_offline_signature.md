@@ -136,6 +136,14 @@ signedTx = new sym.SignedTransaction(signedPayload, signedHash, alice.publicKey,
 await txRepo.announce(signedTx).toPromise();
 ```
 
+後半部分の連署を追加する部分がPayload(サイズ値)を直接操作しているので少し難しいかもしれません。
+Aliceの再度署名できる場合はcosignSignedTxsを生成した後、以下のように連署済みトランザクションを生成することも可能です。
+
+```js
+resignedTx = recreatedTx.signTransactionGivenSignatures(alice, cosignSignedTxs, generationHash);
+await txRepo.announce(resignedTx).toPromise();
+```
+
 ## 12.4 現場で使えるヒント
 
 ### マーケットプレイスレス
