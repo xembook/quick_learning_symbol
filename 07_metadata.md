@@ -60,6 +60,7 @@ aggregateTx = sym.AggregateTransaction.createComplete(
 signedTx = aggregateTx.signTransactionWithCosignatories(
   alice,[bob],generationHash,// 第二引数に連署者
 );
+await txRepo.announce(signedTx).toPromise();
 ```
 
 bobの秘密鍵が分からない場合はこの後の章で説明する
