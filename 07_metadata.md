@@ -102,6 +102,7 @@ await txRepo.announce(signedTx).toPromise();
 登録・更新にはネームスペースを作成したアカウントの署名が必要です。
 
 ```js
+nsRepo = repo.createNamespaceRepository();
 namespaceId = new sym.NamespaceId("xembook");
 namespaceInfo = await nsRepo.getNamespace(namespaceId).toPromise();
 
