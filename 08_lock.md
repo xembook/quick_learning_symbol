@@ -66,14 +66,14 @@ hashLockTx = sym.HashLockTransaction.create(
 signedLockTx = alice.sign(hashLockTx, generationHash);
 
 //ハッシュロックTXをアナウンス
-txRepo.announce(signedLockTx);
+await txRepo.announce(signedLockTx).toPromise();
 ```
 
 ### アグリゲートボンデッドトランザクションのアナウンス
 
 エクスプローラーなどで確認した後、ボンデッドトランザクションをネットワークにアナウンスします。
 ```js
-txRepo.announceAggregateBonded(signedAggregateTx);
+await txRepo.announceAggregateBonded(signedAggregateTx).toPromise();
 ```
 
 
