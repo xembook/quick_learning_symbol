@@ -81,7 +81,8 @@ await txRepo.announceAggregateBonded(signedAggregateTx).toPromise();
 ロックされたトランザクションを指定されたアカウント(Bob)で連署します。
 
 ```js
-cosignatureTx = sym.CosignatureTransaction.create(aggregateTx);
+txInfo = await txRepo.getTransaction(signedAggregateTx.hash,sym.TransactionGroup.Partial).toPromise();
+cosignatureTx = sym.CosignatureTransaction.create(txInfo);
 signedCosTx = bob.signCosignatureTransaction(cosignatureTx);
 await txRepo.announceAggregateBondedCosignature(signedCosTx).toPromise();
 ```
