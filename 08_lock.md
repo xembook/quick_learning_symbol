@@ -71,7 +71,7 @@ txRepo.announce(signedLockTx);
 
 エクスプローラーなどで確認した後、ボンデッドトランザクションをネットワークにアナウンスします。
 ```js
-txRepo.announceAggregateBonded(signedTx);
+txRepo.announceAggregateBonded(signedAggregateTx);
 ```
 
 
