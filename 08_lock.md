@@ -7,7 +7,7 @@ Symbolブロックチェーンにはハッシュロックとシークレット�
 ハッシュロックは後でアナウンスされる予定のトランザクションを事前にハッシュ値で登録しておくことで、
 該当トランザクションがアナウンスされた場合に、そのトランザクションをAPIノード上で処理せずにロックさせて、署名が集まってから処理を行うことができます。
 アカウントが所有するモザイクを操作できないようにロックするわけではなく、ロックするのはハッシュ値の対象となるトランザクションとなります。
-ハッシュロックの有効期限は最大約48時間です。
+ハッシュロックにかかる費用は10XYM、有効期限は最大約48時間です。ロックしたトランザクションが承認されれば10XYMは返却されます。
 
 ### アグリゲートボンデッドトランザクションの作成
 ```js
@@ -54,7 +54,7 @@ signedAggregateTx = alice.sign(aggregateTx, generationHash);
 //ハッシュロックTX作成
 hashLockTx = sym.HashLockTransaction.create(
   sym.Deadline.create(epochAdjustment),
-    networkCurrency.createRelative(10),//固定値
+    new sym.Mosaic(new sym.NamespaceId("symbol.xym"),sym.UInt64.fromUint(10 * 1000000)), //10xym固定値
     sym.UInt64.fromUint(480), // ロック有効期限
     signedAggregateTx,// このハッシュ値を登録
     networkType
