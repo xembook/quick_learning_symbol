@@ -11,6 +11,8 @@ Symbolブロックチェーンにはハッシュロックとシークレット�
 
 ### アグリゲートボンデッドトランザクションの作成
 ```js
+bob = sym.Account.generateNewAccount(networkType);
+
 tx1 = sym.TransferTransaction.create(
     undefined,
     bob.address,  //Bobへの送信
