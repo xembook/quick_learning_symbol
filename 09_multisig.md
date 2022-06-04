@@ -119,7 +119,7 @@ multisigAddresses に対して連署する権利を持っていることが分�
 tx = sym.TransferTransaction.create(
     undefined,
     alice.address, 
-    [networkCurrency.createRelative(1)],
+    [new sym.Mosaic(new sym.NamespaceId("symbol.xym"),sym.UInt64.fromUint(1000000))],
     sym.PlainMessage.create('test'),
     networkType
 );
@@ -148,7 +148,7 @@ await txRepo.announce(signedTx).toPromise();
 tx = sym.TransferTransaction.create(
     undefined,
     alice.address, //Aliceへの送信
-    [networkCurrency.createRelative(1)], //1XYM
+    [new sym.Mosaic(new sym.NamespaceId("symbol.xym"),sym.UInt64.fromUint(1000000))], //1XYM
     sym.PlainMessage.create('test'),
     networkType
 );
@@ -165,7 +165,7 @@ signedAggregateTx = carol1.sign(aggregateTx, generationHash);
 
 hashLockTx = sym.HashLockTransaction.create(
   sym.Deadline.create(epochAdjustment),
-	networkCurrency.createRelative(10), //固定値:10XYM
+	new sym.Mosaic(new sym.NamespaceId("symbol.xym"),sym.UInt64.fromUint(10 * 1000000)), //固定値:10XYM
 	sym.UInt64.fromUint(480),
 	signedAggregateTx,
 	networkType
