@@ -286,7 +286,7 @@ console.log(signerQR.toJSON());
 
 ```js
 qr = require("/node_modules/symbol-qr-library");
-signerQR = qr.AccountQR.fromJSON({暗号化された秘密鍵のJSONデータ},{パスフレーズ});
+signerQR = qr.AccountQR.fromJSON({暗号化された秘密鍵のJSONデータ},"パスフレーズ");
 console.log(signerQR.accountPrivateKey);
 ```
 ```js
