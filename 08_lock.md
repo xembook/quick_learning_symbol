@@ -51,6 +51,11 @@ aggregateTx = sym.AggregateTransaction.createBonded(
 signedAggregateTx = alice.sign(aggregateTx, generationHash);
 ```
 
+tx1,tx2の2つのトランザクションをaggregateArrayで配列にする時に、送信元アカウントの公開鍵を指定します。
+送信元アカウントは後述のマルチシグが設定されている場合もあり、送信の権限を持つ連署者とは限りません。
+公開鍵はアカウントの章を参考に事前にAPIで取得しておきましょう。
+
+
 ### ハッシュロックトランザクションの作成と署名、アナウンス
 ```js
 //ハッシュロックTX作成
