@@ -167,7 +167,7 @@ accountInfo.mosaics.forEach(async mosaic => {
 ```js
 mosaicRepo = repo.createMosaicRepository();
 mosaicAmount = accountInfo.mosaics[0].amount.toString();
-mosaicInfo = await mosaicRepo.getMosaic(accountInfomosaics[0].id).toPromise();
+mosaicInfo = await mosaicRepo.getMosaic(accountInfo.mosaics[0].id).toPromise();
 divisibility = mosaicInfo.divisibility; //可分性
 if(divisibility > 0){
   displayAmount = mosaicAmount.slice(0,mosaicAmount.length-divisibility)  
