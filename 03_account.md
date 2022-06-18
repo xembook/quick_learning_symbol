@@ -145,14 +145,14 @@ console.log(accountInfo);
 クライアント側で作成しただけで、ブロックチェーンでまだ利用されていないアカウント情報は記録されていません。宛先として指定されて受信することで初めてアカウント情報が記録され、署名したトランザクションを送信することで公開鍵の情報が記録されます。そのため、publicKeyは現在`00000...`表記となっています。
 
 #### UInt64
-JavaScriptでは大きすぎる数値はあふれてしまうため、idやamountはUInt64というフォーマットで管理されています。文字列に変換する場合は toString()、数値に変換する場合は compact()、16進数にする場合は toHex() で変換してください。  
+JavaScriptでは大きすぎる数値はあふれてしまうため、idやamountはUInt64というフォーマットで管理されています。文字列に変換する場合は toString()、数値に変換する場合は compact()、16進数にする場合は toHex() で変換してください。
 
 ```js
-mosaicRepo = repo.createMosaicRepository();
+console.log("addressHeight:"); //アドレスが記録されたブロック高
+console.log(accountInfo.addressHeight.compact()); //数値
 accountInfo.mosaics.forEach(async mosaic => {
-  console.log("id:" + mosaic.id.toHex());
-  console.log("amount:" + mosaic.amount.toString());
-  mosaicInfo = await mosaicRepo.getMosaic(mosaic.id).toPromise();
+  console.log("id:" + mosaic.id.toHex()); //16進数
+  console.log("amount:" + mosaic.amount.toString()); //文字列
 });
 ```
 
