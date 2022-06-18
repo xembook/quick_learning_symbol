@@ -144,21 +144,11 @@ XYMは可分性6なので、1XYM=1000000で指定します。
 ### 送信確認
 
 ```js
-txStatus = await tsRepo.getTransactionStatus(signedTx.hash).toPromise();
-console.log(txStatus);
-
 txInfo = await txRepo.getTransaction(signedTx.hash,sym.TransactionGroup.Confirmed).toPromise();
 console.log(txInfo); 
 ```
 ###### 出力例
 ```js
-> TransactionStatus
-    code: "Success"
-    group: "confirmed"
-    deadline: Deadline {adjustedValue: 12776690385}
-    hash: "DE479C001E9736976BDA55E560AB1A5DE526236D9E1BCE24941CF8ED8884289E"
-    height: UInt64 {lower: 326922, higher: 0}
-
 > TransferTransaction
     deadline: Deadline {adjustedValue: 12776690385}
     maxFee: UInt64 {lower: 19200, higher: 0}
@@ -186,8 +176,6 @@ console.log(txInfo);
     type: 16724
     version: 1
 ```
-
-TransactionStatusには `code: "Success"` 、`group: "confirmed"`と表示されているので、トランザクションはブロックに承認されています。
 TransferTransactionのmosaicsに2種類のモザイクが送信されていることが確認できます。また、TransactionInfoに承認されたブロックの情報が記載されています。
 
 ## 5.3 現場で使えるヒント
