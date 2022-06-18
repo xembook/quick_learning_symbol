@@ -94,6 +94,34 @@ await txRepo.announce(signedTx).toPromise();
 配列化した時に、矛盾点がなければ1つのブロック内で問題なく処理することができます。
 
 
+### 確認
+モザイク作成したアカウントが持つモザイク情報を確認します。
+
+```js
+mosaicRepo = repo.createMosaicRepository();
+accountInfo.mosaics.forEach(async mosaic => {
+  mosaicInfo = await mosaicRepo.getMosaic(mosaic.id).toPromise();
+  console.log(mosaicInfo);
+});
+```
+###### 出力例
+```js
+> MosaicInfo {version: 1, recordId: '622988B12A6128903FC10496', id: MosaicId, supply: UInt64, startHeight: UInt64, …}
+> MosaicInfo
+    divisibility: 2 //可分性
+    duration: UInt64 {lower: 0, higher: 0} //有効期限
+  > flags: MosaicFlags
+        restrictable: true //制限設定の可否
+        revokable: true //発行者からの還収可否
+        supplyMutable: true //供給量変更の可否
+        transferable: false //第三者への譲渡可否
+  > id: MosaicId
+        id: Id {lower: 207493124, higher: 890137608} //モザイクID
+    ownerAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152} //作成者アドレス
+    recordId: "62626E3C741381859AFAD4D5" 
+    supply: UInt64 {lower: 1000000, higher: 0} //供給量
+```
+
 ## 5.2 モザイク送信
 
 作成したモザイクを送信します。
