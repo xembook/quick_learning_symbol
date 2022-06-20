@@ -232,6 +232,7 @@ mosaicDefTx = sym.MosaicDefinitionTransaction.create(
     sym.MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
     0,//divisibility:可分性
     sym.UInt64.fromUint(0), //duration:無期限
+    networkType
 );
 
 //モザイク数量固定
@@ -239,6 +240,7 @@ mosaicChangeTx = sym.MosaicSupplyChangeTransaction.create(
     undefined,mosaicId,
     sym.MosaicSupplyChangeAction.Increase, //増やす
     sym.UInt64.fromUint(1), //数量1
+    networkType
 );
 
 //NFTデータ
@@ -247,6 +249,7 @@ nftTx  = sym.TransferTransaction.create(
     alice.address, 
     [],
     sym.PlainMessage.create("Hello Symbol!"), //NFTデータ実体
+    networkType
 )
 
 //モザイクの生成とNFTデータをアグリゲートしてブロックに登録
