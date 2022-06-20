@@ -228,7 +228,7 @@ supplyMutable = false; //供給量変更の可否
 
 //モザイク定義
 mosaicDefTx = sym.MosaicDefinitionTransaction.create(
-    undefined, nonce,mosaicId
+    undefined, nonce,mosaicId,
     sym.MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
     0,//divisibility:可分性
     sym.UInt64.fromUint(0), //duration:無期限
