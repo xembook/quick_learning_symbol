@@ -10,7 +10,8 @@
 本書では1階層のマルチシグのみ解説します。
 
 ## 9.0 アカウントの準備
-この章のサンプルソースコードで使用するアカウントを準備しておきます。
+この章のサンプルソースコードで使用するアカウントを作成し、それぞれの秘密鍵を出力しておきます。
+本章でマルチシグ化したアカウントBobは、Carolの秘密鍵を紛失すると使えなくなってしまうのでご注意ください。
 
 ```js
 bob = sym.Account.generateNewAccount(networkType);
@@ -19,6 +20,13 @@ carol2 = sym.Account.generateNewAccount(networkType);
 carol3 = sym.Account.generateNewAccount(networkType);
 carol4 = sym.Account.generateNewAccount(networkType);
 carol5 = sym.Account.generateNewAccount(networkType);
+
+console.log(bob.privateKey);
+console.log(carol1.privateKey);
+console.log(carol2.privateKey);
+console.log(carol3.privateKey);
+console.log(carol4.privateKey);
+console.log(carol5.privateKey);
 ```
 
 テストネットの場合はFAUCETでネットワーク手数料分をbobとcarol1に補給しておきます。
