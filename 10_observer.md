@@ -160,7 +160,7 @@ function connectNode(nodes) {
 
     return new Promise((resolve, reject) => {
         let req = new XMLHttpRequest();
-        req.timeout = 2000;
+        req.timeout = 2000; //タイムアウト値:2秒(=2000ms)
         req.open('GET', node + "/node/health", true);
         req.onload = function() {
             if (req.status === 200) {
@@ -255,6 +255,9 @@ listener = await listenerKeepOpening(NODES);
 初期画面表示時と画面閲覧中の受信と２パターンの検知が必要です。  
 
 ```js
+//rxjs.operatorsの読み込み
+op  = require("/node_modules/rxjs/operators");
+
 //アグリゲートトランザクション検知
 bondedListener = listener.aggregateBondedAdded(bob.address);
 bondedHttp = txRepo.search({address:bob.address,group:sym.TransactionGroup.Partial})
