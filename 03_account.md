@@ -269,24 +269,20 @@ signerQR.toBase64().subscribe(x =>{
 });
 
 //アカウントを暗号化したJSONデータとして表示
-console.log(signerQR.toJSON());
+jsonSignerQR = signerQR.toJSON();
+console.log(jsonSignerQR);
 ```
 ###### 出力例
 ```js
-> {"v":3,"type":2,"network_id":152,"chain_id":"7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836",
-    "data":{
-      "ciphertext":
-        "6d782997d69d293a9205235ad23a5fb13ALz7Mdb7vRYot40WgaCIWMedlN8kCAAjqnzl0po8khczUuzq3+445rOX+1+igZ+YlWD84VCNJqs4m//eKMGMF5ZlOC4gYXWsGOztbGTwyk=",
-      "salt":"3df82ffe3378951a8633fed212654ec68bd6ced651121e11d2e77d134148188d"
-    }
-  }
+> {"v":3,"type":2,"network_id":152,"chain_id":"7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836","data":{"ciphertext":"e9e2f76cb482fd054bc13b7ca7c9d086E7VxeGS/N8n1WGTc5MwshNMxUiOpSV2CNagtc6dDZ7rVZcnHXrrESS06CtDTLdD7qrNZEZAi166ucDUgk4Yst0P/XJfesCpXRxlzzNgcK8Q=","salt":"54de9318a44cc8990e01baba1bcb92fa111d5bcc0b02ffc6544d2816989dc0e9"}}
 ```
+このjsonSignerQRで出力されるQRコード、あるいはテキストを保存しておけばいつでも秘密鍵を復元することができます。
 
 #### 暗号化された秘密鍵の復号
 
 ```js
 qr = require("/node_modules/symbol-qr-library");
-signerQR = qr.AccountQR.fromJSON({暗号化された秘密鍵のJSONデータ},"パスフレーズ");
+signerQR = qr.AccountQR.fromJSON(jsonSignerQR,"パスフレーズ");
 console.log(signerQR.accountPrivateKey);
 ```
 ```js
