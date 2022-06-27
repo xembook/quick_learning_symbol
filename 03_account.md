@@ -281,10 +281,14 @@ console.log(jsonSignerQR);
 #### 暗号化された秘密鍵の復号
 
 ```js
+//出力されたテキストをjsonSignerQRに代入
+jsonSignerQR = '{"v":3,"type":2,"network_id":152,"chain_id":"7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836","data":{"ciphertext":"e9e2f76cb482fd054bc13b7ca7c9d086E7VxeGS/N8n1WGTc5MwshNMxUiOpSV2CNagtc6dDZ7rVZcnHXrrESS06CtDTLdD7qrNZEZAi166ucDUgk4Yst0P/XJfesCpXRxlzzNgcK8Q=","salt":"54de9318a44cc8990e01baba1bcb92fa111d5bcc0b02ffc6544d2816989dc0e9"}}'
+
 qr = require("/node_modules/symbol-qr-library");
 signerQR = qr.AccountQR.fromJSON(jsonSignerQR,"パスフレーズ");
 console.log(signerQR.accountPrivateKey);
 ```
+###### 出力例
 ```js
 > 1E9139CC1580B4AED6A1FE110085281D4982ED0D89CE07F3380EB83069B1****
 ```
