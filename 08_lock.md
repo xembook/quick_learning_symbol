@@ -146,10 +146,10 @@ lockTx = sym.SecretLockTransaction.create(
     new sym.Mosaic(
       new sym.NamespaceId("symbol.xym"),
       sym.UInt64.fromUint(1000000) //1XYM
-    ),　//ロックするモザイク
+    ), //ロックするモザイク
     sym.UInt64.fromUint(480), //ロック期間(ブロック数)
     sym.LockHashAlgorithm.Op_Sha3_256, //ロックキーワード生成に使用したアルゴリズム
-    secret,　//ロック用キーワード
+    secret, //ロック用キーワード
     bob.address, //解除時の転送先:Bob
     networkType
 ).setMaxFee(100);
