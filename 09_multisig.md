@@ -63,11 +63,11 @@ aggregateTx = sym.AggregateTransaction.createComplete(
       multisigTx.toAggregate(bob.publicAccount),
     ],
     networkType,[]
-).setMaxFeeForAggregate(100, 3);
+).setMaxFeeForAggregate(100, 4);
 
 signedTx =  aggregateTx.signTransactionWithCosignatories(
     bob, //マルチシグ化したいアカウント
-    [carol1,carol2,carol3], //追加・除外対象として指定したアカウント
+    [carol1,carol2,carol3,carol4], //追加・除外対象として指定したアカウント
     generationHash,
 );
 await txRepo.announce(signedTx).toPromise();
@@ -86,10 +86,11 @@ console.log(multisigInfo);
 ```js
 > MultisigAccountInfo 
     accountAddress: Address {address: 'TCOMA5VG67TZH4X55HGZOXOFP7S232CYEQMOS7Q', networkType: 152}
-  > cosignatoryAddresses: Array(3)
+  > cosignatoryAddresses: Array(4)
         0: Address {address: 'TBAFGZOCB7OHZCCYYV64F2IFZL7SOOXNDHFS5NY', networkType: 152}
         1: Address {address: 'TB3XP4GQK6XH2SSA2E2U6UWCESNACK566DS4COY', networkType: 152}
         2: Address {address: 'TCV67BMTD2JMDQOJUDQHBFJHQPG4DAKVKST3YJI', networkType: 152}
+	3: Address {address: 'TDWGG6ZWCGS5AHFTF5FDB347HIMII57PK46AIDA', networkType: 152}
     minApproval: 3
     minRemoval: 3
     multisigAddresses: []
@@ -269,7 +270,6 @@ console.log(txInfo);
 連署者を減らすには除名対象アドレスに指定するとともに最小署名者数を連署者数が超えてしまわないように調整してトランザクションをアナウンスします。
 除名対象者を連署者に含む必要はありません。
 
-（BobをminApproval:2、minRemoval:2でマルチシグ化し、Carol1,Carol2,Carol3を連署者とした構成で以下のプログラムをお試しください）
 ```js
 multisigTx = sym.MultisigAccountModificationTransaction.create(
     undefined, 
@@ -307,8 +307,8 @@ multisigTx = sym.MultisigAccountModificationTransaction.create(
     undefined, 
     0, //承認のために必要な最小署名者数増分
     0, //除名のために必要な最小署名者数増分
-    [carol4.address], //追加対象アドレス
-    [carol3.address], //除名対象アドレス
+    [carol5.address], //追加対象アドレス
+    [carol4.address], //除名対象アドレス
     networkType
 );
 
@@ -322,7 +322,7 @@ aggregateTx = sym.AggregateTransaction.createComplete(
 
 signedTx =  aggregateTx.signTransactionWithCosignatories(
     carol1, //起案者
-    [carol2,carol4], //連署者+承諾アカウント
+    [carol2,carol5], //連署者+承諾アカウント
     generationHash,
 );
 await txRepo.announce(signedTx).toPromise();
