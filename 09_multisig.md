@@ -105,7 +105,9 @@ msigRepo = repo.createMultisigRepository();
 
 multisigInfo = await msigRepo.getMultisigAccountInfo(carol1.address).toPromise();
 console.log(multisigInfo);
-
+```
+###### 出力例
+```
 > MultisigAccountInfo
     accountAddress: Address {address: 'TCV67BMTD2JMDQOJUDQHBFJHQPG4DAKVKST3YJI', networkType: 152}
     cosignatoryAddresses: []
@@ -183,7 +185,10 @@ signedLockTx = carol1.sign(hashLockTx, generationHash);
 
 //ハッシュロックTXをアナウンス
 txRepo.announce(signedLockTx);
-//ハッシュロック承認後、ボンデッドTXをアナウンス
+```
+
+```js
+//ハッシュロックの承認を確認した後、ボンデッドTXをアナウンス
 txRepo.announceAggregateBonded(signedAggregateTx);
 ```
 
@@ -264,6 +269,7 @@ console.log(txInfo);
 連署者を減らすには除名対象アドレスに指定するとともに最小署名者数を連署者数が超えてしまわないように調整してトランザクションをアナウンスします。
 除名対象者を連署者に含む必要はありません。
 
+（BobをminApproval:2、minRemoval:2でマルチシグ化し、Carol1,Carol2,Carol3を連署者とした構成で以下のプログラムをお試しください）
 ```js
 multisigTx = sym.MultisigAccountModificationTransaction.create(
     undefined, 
@@ -294,6 +300,7 @@ await txRepo.announce(signedTx).toPromise();
 
 連署者を差し替えるには、追加対象アドレスと除名対象アドレスを指定します。
 新たに追加指定するアカウントの連署は必ず必要です。
+（BobをminApproval:2、minRemoval:2でマルチシグ化し、Carol1,Carol2,Carol3を連署者とした構成で以下のプログラムをお試しください）
 
 ```js
 multisigTx = sym.MultisigAccountModificationTransaction.create(
