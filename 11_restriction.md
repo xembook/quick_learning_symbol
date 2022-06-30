@@ -9,7 +9,7 @@ carol = sym.Account.generateNewAccount(networkType);
 console.log(carol.address);
 
 //FAUCET URL出力
-console.log("https://testnet.symbol.tools/?recipient=" + carol.address.plain() +"&amount=10");
+console.log("https://testnet.symbol.tools/?recipient=" + carol.address.plain() +"&amount=100");
 ```
 ## 11.1 アカウント制限
 
