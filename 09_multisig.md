@@ -300,7 +300,6 @@ await txRepo.announce(signedTx).toPromise();
 
 連署者を差し替えるには、追加対象アドレスと除名対象アドレスを指定します。
 新たに追加指定するアカウントの連署は必ず必要です。
-（BobをminApproval:2、minRemoval:2でマルチシグ化し、Carol1,Carol2,Carol3を連署者とした構成で以下のプログラムをお試しください）
 
 ```js
 multisigTx = sym.MultisigAccountModificationTransaction.create(
