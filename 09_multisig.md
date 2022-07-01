@@ -43,7 +43,7 @@ console.log("https://testnet.symbol.tools/?recipient=" + carol1.address.plain() 
 ## 9.1 マルチシグの登録
 
 Symbolではマルチシグアカウントを新規に作成するのではなく、既存アカウントについて連署者を指定してマルチシグ化します。
-マルチシグ化には連署者に指定されたアカウントの承諾署名が必要なため、アグリゲートトランザクションを使用します。
+マルチシグ化には連署者に指定されたアカウントの承諾署名(オプトイン)が必要なため、アグリゲートトランザクションを使用します。
 
 ```js
 multisigTx = sym.MultisigAccountModificationTransaction.create(
@@ -192,6 +192,8 @@ txRepo.announce(signedLockTx);
 //ハッシュロックの承認を確認した後、ボンデッドTXをアナウンス
 txRepo.announceAggregateBonded(signedAggregateTx);
 ```
+ボンデッドトランザクションがノードに取り込まれるとパーシャル署名状態となるので、8.ロックで紹介した連署を使用して、マルチシグアカウントで連署します。
+連署をサポートするウォレットで承認することもできます。
 
 
 ## 9.4 マルチシグ送信の確認
