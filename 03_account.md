@@ -191,7 +191,7 @@ bobPublicAccount = bob.publicAccount;
 
 #### 暗号化
 
-Aliceの公開鍵・Bobの公開鍵で暗号化し、Aliceの公開鍵・Bobの秘密鍵で復号します。
+Aliceの秘密鍵・Bobの公開鍵で暗号化し、Aliceの公開鍵・Bobの秘密鍵で復号します。
 
 ```js
 message = 'Hello Symol!';
