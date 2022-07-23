@@ -111,7 +111,7 @@ listener.newBlock()をしておくと、約30秒ごとに通信が発生する�
 
 ```js
 listener.open().then(() => {
-    //ブロック生成の検知
+    //署名が必要なアグリゲートボンデッドトランザクション発生の検知
     listener.aggregateBondedAdded(alice.address)
     .subscribe(async tx=>console.log(tx));
 });
