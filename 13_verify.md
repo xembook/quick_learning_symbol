@@ -229,7 +229,7 @@ if(block.type ===  sym.BlockType.ImportanceBlock){
 }
 ```
 
-続くアカウント・メタデータの検証のために、stateHashSubCacheMerkleRootsを検証しておきます。
+後述するアカウントやメタデータの検証のために、stateHashSubCacheMerkleRootsを検証しておきます。
 
 ### stateHashの検証
 ```js
