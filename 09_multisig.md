@@ -188,7 +188,7 @@ hashLockTx = sym.HashLockTransaction.create(
 signedLockTx = carol1.sign(hashLockTx, generationHash);
 
 //ハッシュロックTXをアナウンス
-txRepo.announce(signedLockTx);
+await txRepo.announce(signedLockTx).toPromise();
 ```
 
 ```js
