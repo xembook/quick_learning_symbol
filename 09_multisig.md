@@ -36,8 +36,8 @@ console.log(carol5.privateKey);
 
 ##### URL出力
 ```js
-console.log("https://testnet.symbol.tools/?recipient=" + bob.address.plain() +"&amount=10");
-console.log("https://testnet.symbol.tools/?recipient=" + carol1.address.plain() +"&amount=10");
+console.log("https://testnet.symbol.tools/?recipient=" + bob.address.plain() +"&amount=20");
+console.log("https://testnet.symbol.tools/?recipient=" + carol1.address.plain() +"&amount=20");
 ```
 
 ## 9.1 マルチシグの登録
