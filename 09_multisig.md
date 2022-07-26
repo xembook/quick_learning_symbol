@@ -193,7 +193,7 @@ await txRepo.announce(signedLockTx).toPromise();
 
 ```js
 //ハッシュロックの承認を確認した後、ボンデッドTXをアナウンス
-txRepo.announceAggregateBonded(signedAggregateTx);
+await txRepo.announceAggregateBonded(signedAggregateTx).toPromise();
 ```
 ボンデッドトランザクションがノードに取り込まれるとパーシャル署名状態となるので、8.ロックで紹介した連署を使用して、マルチシグアカウントで連署します。
 連署をサポートするウォレットで承認することもできます。
