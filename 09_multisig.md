@@ -63,7 +63,7 @@ aggregateTx = sym.AggregateTransaction.createComplete(
       multisigTx.toAggregate(bob.publicAccount),
     ],
     networkType,[]
-).setMaxFeeForAggregate(100, 4);
+).setMaxFeeForAggregate(100, 4); // 第二引数に連署者の数:4
 
 signedTx =  aggregateTx.signTransactionWithCosignatories(
     bob, //マルチシグ化したいアカウント
@@ -143,7 +143,7 @@ aggregateTx = sym.AggregateTransaction.createComplete(
        tx.toAggregate(bob.publicAccount)
      ],
     networkType,[],
-).setMaxFeeForAggregate(100, 2);
+).setMaxFeeForAggregate(100, 2); // 第二引数に連署者の数:2
 
 signedTx =  aggregateTx.signTransactionWithCosignatories(
     carol1, //起案者
@@ -173,7 +173,7 @@ aggregateTx = sym.AggregateTransaction.createBonded(
        tx.toAggregate(bob.publicAccount)
      ],
     networkType,[],
-).setMaxFeeForAggregate(100, 0);
+).setMaxFeeForAggregate(100, 0); // 第二引数に連署者の数:0
 
 signedAggregateTx = carol1.sign(aggregateTx, generationHash);
 
@@ -291,7 +291,7 @@ aggregateTx = sym.AggregateTransaction.createComplete(
       multisigTx.toAggregate(bob.publicAccount),
     ],
     networkType,[]    
-).setMaxFeeForAggregate(100, 1);
+).setMaxFeeForAggregate(100, 1); // 第二引数に連署者の数:1
 
 signedTx =  aggregateTx.signTransactionWithCosignatories(
     carol1,
@@ -322,7 +322,7 @@ aggregateTx = sym.AggregateTransaction.createComplete(
       multisigTx.toAggregate(bob.publicAccount),
     ],
     networkType,[]    
-).setMaxFeeForAggregate(100, 2);
+).setMaxFeeForAggregate(100, 2); // 第二引数に連署者の数:2
 
 signedTx =  aggregateTx.signTransactionWithCosignatories(
     carol1, //起案者
