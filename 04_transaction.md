@@ -78,8 +78,12 @@ sym.PlainMessage.create("Hello Symbol!")
 
 ##### 暗号文メッセージ
 ```js
-sym.EncryptedMessage('test');
+sym.EncryptedMessage('294C8979156C0D941270BAC191F7C689E93371EDBC36ADD8B920CF494012A97BA2D1A3759F9A6D55D5957E9D');
 ```
+
+EncryptedMessageを使用すると、「指定したメッセージが暗号化されています」という意味のフラグ（目印）がつきます。
+エクスプローラーやウォレットはそのフラグを参考にメッセージを無用にデコードしなかったり、非表示にしたりなどの処理を行います。
+このメソッドが暗号化をするわけではありません。
 
 ##### 生データ
 ```js
