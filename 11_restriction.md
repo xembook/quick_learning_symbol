@@ -141,10 +141,12 @@ mosaicResService = new sym.MosaicRestrictionTransactionService(resMosaicRepo,nsR
 
 
 ### グローバル制限機能つきモザイクの作成
+restrictableをtrueにしてCarolでモザイクを作成します。
+
 ```js
 supplyMutable = true; //供給量変更の可否
 transferable = true; //第三者への譲渡可否
-restrictable = true; //制限設定の可否
+restrictable = true; //グローバル制限設定の可否
 revokable = true; //発行者からの還収可否
 
 nonce = sym.MosaicNonce.createRandom();
@@ -285,7 +287,7 @@ console.log(res);
 実際にモザイクを送信してみて、制限状態を確認します。
 
 ```js
-//成功
+//成功（CarolからBobに送信）
 trTx = sym.TransferTransaction.create(
         sym.Deadline.create(epochAdjustment),
         bob.address, 
@@ -296,17 +298,16 @@ trTx = sym.TransferTransaction.create(
 signedTx = carol.sign(trTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 
-//失敗
+//失敗（CarolからDaveに送信）
 dave = sym.Account.generateNewAccount(networkType);
-//手数料分のXYMを送信後、以下のトランザクションを実行
 trTx = sym.TransferTransaction.create(
         sym.Deadline.create(epochAdjustment),
-        carol.address, 
+        dave.address, 
         [new sym.Mosaic(mosaicDefTx.mosaicId, sym.UInt64.fromUint(1))],
         sym.PlainMessage.create(""),
         networkType
       ).setMaxFee(100);
-signedTx = dave.sign(trTx,generationHash);
+signedTx = carol.sign(trTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
