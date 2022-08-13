@@ -7,7 +7,7 @@
 
 ## 13.1 トランザクションの検証
 
-トランザクションがブロックヘッダーに含まれていることを検証します。
+トランザクションがブロックヘッダーに含まれていることを検証します。この検証が成功すれば、トランザクションがブロックチェーンの合意によって承認されたものとみなすことができます。
 
 本章のサンプルスクリプトを実行する前に以下を実行して必要ライブラリを読み込んでおいてください。
 ```js
@@ -150,6 +150,7 @@ console.log(result);
 
 既知のブロックハッシュ値（例：ファイナライズブロック）から、検証中のブロックヘッダーまでたどれることを検証します。
 
+
 ### normalブロックの検証
 
 ```js
@@ -188,7 +189,7 @@ true が出力されればこのブロックハッシュは前ブロックハッ
 
 ### importanceブロックの検証
 
-importanceBlockは、importance値の再計算が行われるブロック(720ブロック毎)です。  
+importanceBlockは、importance値の再計算が行われるブロック(720ブロック毎、テストネットは180ブロック毎)です。  
 NormalBlockに加えて以下の情報が追加されています。  
 
 - votingEligibleAccountsCount
@@ -275,6 +276,7 @@ console.log(block.stateHash === hash);
 ## 13.3 アカウント・メタデータの検証
 
 マークルパトリシアツリーを利用して、トランザクションに紐づくアカウントやメタデータの存在を検証します。  
+サービス提供者がマークルパトリシアツリーを提供すれば、利用者は自分の意志で選択したノードを使ってその真偽を検証することができます。
 
 ### 検証用共通関数
 
@@ -346,12 +348,14 @@ hasher = sha3_256.create();
 aliceInfo = await accountRepo.getAccountInfo(aliceAddress).toPromise();
 aliceStateHash = hasher.update(aliceInfo.serialize()).hex().toUpperCase();
 
-//サービス提供者以外のノードから取得
+//サービス提供者以外のノードから最新のブロックヘッダー情報を取得
 blockInfo = await blockRepo.search({order:"desc"}).toPromise();
 rootHash = blockInfo.data[0].stateHashSubCacheMerkleRoots[0];
 
-//サービス提供者を含む任意のノードから取得
+//サービス提供者を含む任意のノードからマークル情報を取得
 stateProof = await stateProofService.accountById(aliceAddress).toPromise();
+
+//検証
 checkState(stateProof,aliceStateHash,alicePathHash,rootHash);
 ```
 
@@ -401,12 +405,14 @@ hasher.update(cat.GeneratorUtils.uintToBuffer(value.length, 2));
 hasher.update(value); 
 stateHash = hasher.hex();
 
-//サービス提供者以外のノードから取得
+//サービス提供者以外のノードから最新のブロックヘッダー情報を取得
 blockInfo = await blockRepo.search({order:"desc"}).toPromise();
 rootHash = blockInfo.data[0].stateHashSubCacheMerkleRoots[8];
 
-//サービス提供者を含む任意のノードから取得
+//サービス提供者を含む任意のノードからマークル情報を取得
 stateProof = await stateProofService.metadataById(compositeHash).toPromise();
+
+//検証
 checkState(stateProof,stateHash,pathHash,rootHash);
 ```
 
@@ -454,12 +460,14 @@ hasher.update(cat.GeneratorUtils.uintToBuffer(value.length, 2));
 hasher.update(value); 
 stateHash = hasher.hex();
 
-//サービス提供者以外のノードから取得
+//サービス提供者以外のノードから最新のブロックヘッダー情報を取得
 blockInfo = await blockRepo.search({order:"desc"}).toPromise();
 rootHash = blockInfo.data[0].stateHashSubCacheMerkleRoots[8];
 
-//サービス提供者を含む任意のノードから取得
+//サービス提供者を含む任意のノードからマークル情報を取得
 stateProof = await stateProofService.metadataById(compositeHash).toPromise();
+
+//検証
 checkState(stateProof,stateHash,pathHash,rootHash);
 ```
 
