@@ -271,8 +271,22 @@ namespaceIds = accountNames[0].names.map(name=>{
   return name.namespaceId;
 });
 console.log(namespaceIds);
-
 ```
+
+モザイクに紐づけられたネームスペースを全て調べます。
+```js
+nsRepo = repo.createNamespaceRepository();
+
+mosaicNames = await nsRepo.getMosaicsNames(
+  [new sym.MosaicId("23A72A2876482029")]
+).toPromise();
+
+namespaceIds = mosaicNames[0].names.map(name=>{
+  return name.namespaceId;
+});
+console.log(namespaceIds);
+```
+
 
 ### レシートの参照
 
