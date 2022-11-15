@@ -60,7 +60,7 @@ mosaicChangeTx = sym.MosaicSupplyChangeTransaction.create(
     undefined,
     mosaicDefTx.mosaicId,
     sym.MosaicSupplyChangeAction.Increase,
-    sym.UInt64.fromUint(1000000),
+    sym.UInt64.fromUint(1000000), //数量
     networkType
 );
 ```
@@ -140,7 +140,7 @@ tx = sym.TransferTransaction.create(
     // 送信モザイクリスト
     [ 
       new sym.Mosaic(
-        new sym.MosaicId("3A8416DB2D53B6C8"), //テストネットXYM
+        new sym.MosaicId("72C0212E67A08BCE"), //テストネットXYM
         sym.UInt64.fromUint(1000000) //1XYM(divisibility:6)
       ),
       new sym.Mosaic(
@@ -163,7 +163,7 @@ await txRepo.announce(signedTx).toPromise();
 複数のモザイクを一度に送信できます。
 XYMを送信するには以下のモザイクIDを指定します。
 - メインネット：6BED913FA20223F8
-- テストネット：3A8416DB2D53B6C8
+- テストネット：72C0212E67A08BCE
 
 #### 送信量
 小数点もすべて整数にして指定します。
