@@ -42,7 +42,7 @@ AddressRestrictionFlagにはAllowIncomingAddressのほか、上記のような�
 
 ### 指定モザイクの受信制限
 ```js
-mosaicId = new sym.MosaicId("3A8416DB2D53B6C8"); //テストネット XYM
+mosaicId = new sym.MosaicId("72C0212E67A08BCE"); //テストネット XYM
 tx = sym.AccountRestrictionTransaction.createMosaicRestrictionModificationTransaction(
   sym.Deadline.create(epochAdjustment),
   sym.MosaicRestrictionFlag.BlockMosaic, //モザイク制限フラグ
