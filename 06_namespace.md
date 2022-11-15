@@ -278,7 +278,7 @@ console.log(namespaceIds);
 nsRepo = repo.createNamespaceRepository();
 
 mosaicNames = await nsRepo.getMosaicsNames(
-  [new sym.MosaicId("3A8416DB2D53B6C8")]
+  [new sym.MosaicId("72C0212E67A08BCE")]
 ).toPromise();
 
 namespaceIds = mosaicNames[0].names.map(name=>{
