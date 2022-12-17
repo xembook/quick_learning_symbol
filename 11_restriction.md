@@ -34,7 +34,7 @@ AddressRestrictionFlagについては以下の通りです。
 {1: 'AllowIncomingAddress', 16385: 'AllowOutgoingAddress', 32769: 'BlockIncomingAddress', 49153: 'BlockOutgoingAddress'}
 ```
 
-AddressRestrictionFlagにはAllowIncomingAddressのほか、上記のようなフラグが使用できます。
+AddressRestrictionFlagにはAllowIncomingAddressのほか、下記のようなフラグが使用できます。
 - AllowIncomingAddress：指定アドレスからのみ受信許可
 - AllowOutgoingAddress：指定アドレス宛のみ送信許可
 - BlockIncomingAddress：指定アドレスからの受信受拒否
