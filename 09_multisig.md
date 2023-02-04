@@ -291,7 +291,7 @@ aggregateTx = sym.AggregateTransaction.createComplete(
       multisigTx.toAggregate(bob.publicAccount),
     ],
     networkType,[]    
-).setMaxFeeForAggregate(100, 2); // 第二引数に連署者の数:
+).setMaxFeeForAggregate(100, 2); // 第二引数に連署者の数:2
 
 signedTx =  aggregateTx.signTransactionWithCosignatories(
     carol1,
