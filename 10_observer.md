@@ -257,8 +257,9 @@ listener = await listenerKeepOpening(NODES);
 初期画面表示時と画面閲覧中の受信と２パターンの検知が必要です。  
 
 ```js
-//rxjs.operatorsの読み込み
+//rxjsの読み込み
 op  = require("/node_modules/rxjs/operators");
+rxjs = require("/node_modules/rxjs");
 
 //アグリゲートトランザクション検知
 bondedListener = listener.aggregateBondedAdded(bob.address);
