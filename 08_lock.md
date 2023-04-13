@@ -238,13 +238,13 @@ console.log(txInfo);
 
 SecretProofTransactionにはモザイクの受信量の情報は含まれていません。
 ブロック生成時に作成されるレシートで受信量を確認します。
-レシートタイプ:LockHash_Completed でBob宛のレシートを検索してみます。
+レシートタイプ:LockSecret_Completed でBob宛のレシートを検索してみます。
 
 ```js
 receiptRepo = repo.createReceiptRepository();
 
 receiptInfo = await receiptRepo.searchReceipts({
-    receiptType:sym.ReceiptTypeLockHash_Completed,
+    receiptType:sym.LockSecret_Completed,
     targetAddress:bob.address
 }).toPromise();
 console.log(receiptInfo.data);
