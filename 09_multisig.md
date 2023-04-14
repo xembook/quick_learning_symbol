@@ -173,7 +173,7 @@ aggregateTx = sym.AggregateTransaction.createBonded(
        tx.toAggregate(bob.publicAccount)
      ],
     networkType,[],
-).setMaxFeeForAggregate(100, 0); // 第二引数に連署者の数:0
+).setMaxFeeForAggregate(100, 2); // 第二引数に連署者の数:2
 
 signedAggregateTx = carol1.sign(aggregateTx, generationHash);
 
