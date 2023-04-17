@@ -382,7 +382,7 @@ hasher.update(srcAddress);
 hasher.update(targetAddress);
 hasher.update(sym.Convert.hexToUint8Reverse("CF217E116AA422E2")); // scopeKey
 hasher.update(sym.Convert.hexToUint8Reverse("1275B0B7511D9161")); // targetId
-hasher.update(Uint8Array.from([sym.MetadataType.Mosaic])); // type: Account 0
+hasher.update(Uint8Array.from([sym.MetadataType.Mosaic])); // type: Mosaic 1
 compositeHash = hasher.hex();
 
 hasher = sha3_256.create();   
@@ -397,7 +397,7 @@ hasher.update(srcAddress);
 hasher.update(targetAddress);
 hasher.update(sym.Convert.hexToUint8Reverse("CF217E116AA422E2")); // scopeKey
 hasher.update(sym.Convert.hexToUint8Reverse("1275B0B7511D9161")); // targetId
-hasher.update(Uint8Array.from([sym.MetadataType.Mosaic])); //account
+hasher.update(Uint8Array.from([sym.MetadataType.Mosaic])); //mosaic
 
 value = Buffer.from("test");
 
